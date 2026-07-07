@@ -13,3 +13,6 @@ examples/outputs/
 .DS_Store
 *.log
 .ipynb_checkpoints/
+data/real/ 
+tciaDownload/ 
+data/real/ 

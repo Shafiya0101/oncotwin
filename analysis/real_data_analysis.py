@@ -102,6 +102,9 @@ def main():
     fig.tight_layout(); fig.savefig(f"{OUT}/real_survival_validation.png", dpi=140)
     print(f"Saved {OUT}/real_survival_validation.png")
 
+    verdict = ("does **not** predict real survival better than chance" if c < 0.55
+               else "shows **modest** signal for real survival" if c < 0.65
+               else "orders real patients' survival **better than chance**")
     with open(os.path.join(HERE, "REAL_RESULTS.md"), "w", encoding="utf-8") as fh:
         fh.write(f"""# Real-data validation (NSCLC-Radiomics / Lung1)
 
@@ -109,19 +112,28 @@ Source: TCIA NSCLC-Radiomics clinical data — {len(records)} real NSCLC patient
 For each patient the twin is built from real age, stage, and histology; its
 implied tumor growth rate is used as a risk score and compared to real survival.
 
-- **Concordance index: {c:.3f}** (0.5 = chance). The twin's biology-based risk
-  orders real patients' survival better than chance.
+- **Concordance index: {c:.3f}** (0.5 = chance). At this value, the twin's
+  biology-based risk {verdict}.
 - **Median survival** — twin high-risk group: {m_hi:.0f} days;
   low-risk group: {m_lo:.0f} days.
 
 ![survival by twin risk](outputs/real_survival_validation.png)
 
+## Why this result — and what would move it
+
+The growth model was never trained on survival (it uses hand-set biological
+priors), and the imaging features that carry the prognostic signal — tumor
+volume, heterogeneity — are not yet loaded per patient (they use defaults), so
+the twin's risk here is driven mainly by stage and age. The landmark study on
+this dataset showed radiomic features from the scans do predict survival.
+Moving this number means ingesting the real scans with expert masks across the
+cohort and training the estimator against survival directly.
+
 ## Honest limitations
 
-Tumor volume, Ki-67, and imaging heterogeneity are not in the clinical file, so
-here the twin's risk is driven mainly by stage and age. Ingesting the real CT
-scans (segmentation + radiomics) is the next step and should improve the signal.
-This is a simple validation, not a trained survival model.
+Tumor volume, Ki-67, and imaging heterogeneity use cohort defaults (no
+per-patient imaging yet). This is a simple validation, not a trained survival
+model — and the result is reported exactly as it came out.
 """)
     print("Wrote analysis/REAL_RESULTS.md")
 

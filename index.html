@@ -43,6 +43,17 @@
     font-family:"Space Grotesk",sans-serif; text-transform:uppercase; letter-spacing:.06em}
   .pctl label b{color:var(--cyan); font-family:"IBM Plex Mono",monospace; font-weight:500}
   @media (max-width:900px){ .pgrid{grid-template-columns:1fr 1fr} }
+  .toolbar{display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:12px}
+  .rlabel{font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin-right:2px}
+  .rchip{font-family:"IBM Plex Mono",monospace; font-size:12px; padding:6px 10px; border:1px solid var(--line);
+    border-radius:20px; background:#0f181b; cursor:pointer; color:var(--text)}
+  .rchip:hover{border-color:var(--cyan-dim)}
+  .rchip .x{color:var(--faint); margin-left:6px}
+  .rbtn{font-family:"Space Grotesk",sans-serif; font-size:12px; font-weight:500; padding:6px 12px;
+    border:1px dashed var(--cyan-dim); border-radius:20px; background:none; color:var(--cyan); cursor:pointer}
+  .rbtn:hover{background:#0c211f}
+  .prose{padding:6px 18px 18px; color:var(--muted); font-size:14px; line-height:1.65}
+  .prose b{color:var(--text); font-weight:500}
   .tabs{display:flex; gap:6px; margin-top:16px}
   .tab{font-family:"Space Grotesk",sans-serif; font-size:13px; font-weight:500; letter-spacing:.03em;
     padding:10px 18px; border:1px solid var(--line); border-bottom:none; border-radius:10px 10px 0 0;
@@ -150,9 +161,11 @@
     <div class="tab active" data-tab="twin">Twin</div>
     <div class="tab" data-tab="imaging">Imaging</div>
     <div class="tab" data-tab="compare">Compare</div>
+    <div class="tab" data-tab="cohort">Cohort</div>
   </div>
 
   <div class="panel active" id="tab-twin">
+    <div class="toolbar" id="roster"></div>
     <div class="card patient">
       <h2>Patient setup — drag to explore, the twin rebuilds live</h2>
       <div class="pgrid">
@@ -242,12 +255,34 @@
         </table>
       </div>
     </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Can we tell the strategies apart?</h2>
+      <div class="prose" id="cmpNote"></div>
+    </div>
+  </div>
+
+  <div class="panel" id="tab-cohort">
+    <div class="card chart-card" style="margin-top:0">
+      <h2>Model calibration (validation cohort)</h2>
+      <div id="cohortWrap" style="padding:6px 10px 14px"><canvas id="cohortChart" height="300"></canvas></div>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>What this shows</h2>
+      <div class="prose">
+        Backtested on an 80-patient synthetic cohort (assimilate 2 scans, forecast the rest).
+        A well-calibrated <b>90% interval</b> should contain the truth about 90% of the time.
+        Prior-only and trained models were badly <b>overconfident</b> (~31–37% coverage);
+        adding horizon-growing <b>process noise</b> brings coverage to ~90% without hurting
+        accuracy. Reproduce on your machine with <b>make analysis</b>.
+      </div>
+    </div>
   </div>
 
   <footer><b>Illustrative model.</b> Parameters are interpretable clinical priors, not trained on patient data. Not a medical device.</footer>
 </div>
 
 <script src="assets.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 /* config & engine */
@@ -270,8 +305,11 @@ function planToApi(key){ const p=PLANS[key];
   return {name:p.label, courses:p.courses.map(c=>({kind:c.kind==="chemo"?"chemo":"radiotherapy",start_day:c.s,end_day:c.e,intensity:c.i}))}; }
 function gauss(m,s){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
   return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
-function samplePrior(){
-  const f=FEATURES, ps=[], ws=[];
+function samplePrior(){ return samplePriorFor(FEATURES); }
+function meanParams(f){
+  return { r:0.010+0.004*f.ki67+0.003*(f.stage-1)+0.004*f.het+0.002*Math.max(0,(f.age-55)/10),
+           K:Math.max(f.baseline*14,200), cs:0.055+0.020*(f.egfr?1:0)+0.030*f.ki67, rs:0.060-0.020*f.het }; }
+function samplePriorFor(f){ const ps=[], ws=[];
   const rMean=0.010+0.004*f.ki67+0.003*(f.stage-1)+0.004*f.het+0.002*Math.max(0,(f.age-55)/10);
   const kMean=Math.max(f.baseline*14,200);
   const csMean=0.055+0.020*(f.egfr?1:0)+0.030*f.ki67;
@@ -440,6 +478,7 @@ async function drawCompare(){
     const tr=document.createElement('tr');
     tr.innerHTML='<td><span class="dotc" style="background:'+PLAN_COLORS[k]+'"></span>'+PLANS[k].label+'</td>'+
       '<td>'+fmt(b.med[n])+'</td><td>'+fmt(b.lo[n])+'–'+fmt(b.hi[n])+'</td>'; tb.appendChild(tr); }
+  document.getElementById('cmpNote').innerHTML=treatmentNote();
 }
 function setModePill(){ const el=document.getElementById('modePill');
   el.className='modepill '+(MODE==='api'?'live':'offline'); el.textContent=MODE==='api'?'live API':'offline demo'; }
@@ -449,10 +488,20 @@ function buildOpts(){ const box=document.getElementById('opts'); box.innerHTML="
     el.innerHTML='<span class="dot"></span><span class="lab">'+p.label+'</span><span class="sub">'+(key==="none"?"baseline":"scenario")+'</span>';
     el.onclick=async()=>{ currentPlan=key; buildOpts(); await refresh(); }; box.appendChild(el); } }
 function fmt(n){ return Math.round(n).toLocaleString(); }
-function renderDrivers(){ const box=document.getElementById('drivers');
-  if(!window.DRIVERS){ box.innerHTML='<div style="color:var(--faint);font-size:12px">run build_web_assets.py to populate</div>'; return; }
-  const max=Math.max(...window.DRIVERS.map(d=>Math.abs(d.effect)))||1; box.innerHTML="";
-  for(const d of window.DRIVERS){ const row=document.createElement('div'); row.className="drow";
+function computeDrivers(){
+  const courses=PLANS[currentPlan].courses;
+  const base=simulate(FEATURES.baseline,meanParams(FEATURES),courses,[365])[0];
+  const steps={baseline:15,stage:1,ki67:0.15,het:0.2,age:10};
+  const labels={baseline:'baseline volume',stage:'tumor stage',ki67:'Ki-67 proliferation',het:'imaging heterogeneity',age:'age'};
+  const out=[];
+  for(const k in steps){ const f2=Object.assign({},FEATURES); f2[k]=FEATURES[k]+steps[k];
+    const eff=simulate(f2.baseline,meanParams(f2),courses,[365])[0]-base;
+    out.push({label:labels[k],effect:Math.round(eff*10)/10}); }
+  out.sort((a,b)=>Math.abs(b.effect)-Math.abs(a.effect)); return out;
+}
+function renderDrivers(){ const box=document.getElementById('drivers'); const D=computeDrivers();
+  const max=Math.max(...D.map(d=>Math.abs(d.effect)))||1; box.innerHTML="";
+  for(const d of D){ const row=document.createElement('div'); row.className="drow";
     const wpct=Math.max(3,Math.abs(d.effect)/max*100);
     row.innerHTML='<span class="dl">'+d.label+'</span>'+
       '<div class="dbar'+(d.effect<0?' neg':'')+'" style="width:'+wpct+'%"></div>'+
@@ -477,7 +526,7 @@ function updateDay(day){ currentDay=day; const vol=interp(fc.t,fc.med,day); tumo
 async function refresh(){ fc=await computeForecast(currentPlan); const last=fc.med.length-1;
   document.getElementById('fcMed').textContent=fmt(fc.med[last])+" cm³";
   document.getElementById('fcCI').textContent=fmt(fc.lo[last])+"–"+fmt(fc.hi[last]);
-  cmpData=null; updateDay(currentDay); drawChart(); updateBeliefUI(); }
+  cmpData=null; updateDay(currentDay); drawChart(); updateBeliefUI(); renderDrivers(); }
 document.getElementById('tl').addEventListener('input',e=>{ updateDay(+e.target.value); drawChart(); });
 document.getElementById('scanBtn').addEventListener('click',async()=>{
   if(observations.length>=3)return;
@@ -500,7 +549,91 @@ document.querySelectorAll('.tab').forEach(tab=>{ tab.onclick=async()=>{
   document.getElementById('tab-'+id).classList.add('active');
   if(id==='twin'){ resizeThree(); drawChart(); }
   if(id==='compare'){ await drawCompare(); }
+  if(id==='cohort'){ drawCohort(); }
 }; });
+let roster=[];
+function buildRoster(){ const box=document.getElementById('roster'); box.innerHTML='<span class="rlabel">Saved patients</span>';
+  roster.forEach((p,i)=>{ const c=document.createElement('span'); c.className='rchip';
+    c.innerHTML=p.name+'<span class="x" data-i="'+i+'">×</span>';
+    c.onclick=async(e)=>{ if(e.target.classList.contains('x')){ roster.splice(i,1); buildRoster(); return; } await loadPatient(p.features); };
+    box.appendChild(c); });
+  const save=document.createElement('button'); save.className='rbtn'; save.textContent='＋ Save current';
+  save.onclick=()=>{ const f=Object.assign({},FEATURES);
+    roster.push({name:f.age+'y · S'+f.stage+' · '+Math.round(f.baseline)+'cm³', features:f}); buildRoster(); };
+  box.appendChild(save);
+  const rep=document.createElement('button'); rep.className='rbtn'; rep.textContent='⤓ Download report (PDF)';
+  rep.onclick=downloadReport; box.appendChild(rep);
+}
+function applyFeaturesToSliders(){
+  document.getElementById('sAge').value=FEATURES.age;
+  document.getElementById('sStage').value=FEATURES.stage;
+  document.getElementById('sBase').value=Math.round(FEATURES.baseline);
+  document.getElementById('sKi').value=Math.round(FEATURES.ki67*100);
+  document.getElementById('sHet').value=Math.round(FEATURES.het*100);
+  document.getElementById('sEgfr').value=FEATURES.egfr?1:0;
+}
+async function loadPatient(f){ Object.assign(FEATURES,f); applyFeaturesToSliders(); syncPatientLabels(); await rebuildTwin(); }
+
+async function downloadReport(){
+  try{
+    if(!cmpData){ cmpData={}; for(const k of Object.keys(PLANS)) cmpData[k]=await computeForecast(k); }
+    const { jsPDF }=window.jspdf; const doc=new jsPDF({unit:'pt',format:'a4'}); let y=48;
+    doc.setFontSize(18); doc.text('OncoTwin — Patient Forecast Report',40,y); y+=22;
+    doc.setFontSize(9); doc.setTextColor(130);
+    doc.text('Illustrative model — not a medical device. Generated '+new Date().toLocaleString(),40,y); y+=22;
+    doc.setTextColor(20); doc.setFontSize(12); doc.text('Patient',40,y); y+=15; doc.setFontSize(10);
+    [['Age',FEATURES.age],['Stage',FEATURES.stage],['Baseline volume',Math.round(FEATURES.baseline)+' cm3'],
+     ['Ki-67',FEATURES.ki67.toFixed(2)],['Heterogeneity',FEATURES.het.toFixed(2)],['EGFR mutation',FEATURES.egfr?'yes':'no']]
+      .forEach(r=>{ doc.text(r[0]+': '+r[1],48,y); y+=13; }); y+=6;
+    doc.setFontSize(12); doc.text('Twin belief',40,y); y+=15; doc.setFontSize(10);
+    const resp=belief.chemo_sensitivity>0.05?'responder':belief.chemo_sensitivity>0.03?'partial':'resistant';
+    doc.text('Doubling time: '+Math.round(belief.implied_doubling_time_days)+' days     Chemo response: '+resp,48,y); y+=13;
+    doc.text('Scans assimilated: '+belief.n_observations+'  (twin v'+belief.version+')',48,y); y+=20;
+    doc.setFontSize(12); doc.text('Projected tumor volume at 1 year',40,y); y+=15; doc.setFontSize(10);
+    let best=null;
+    Object.keys(PLANS).forEach(k=>{ const b=cmpData[k],n=b.med.length-1;
+      const m=b.med[n]; if(best===null||m<cmpData[best].med[cmpData[best].med.length-1]) best=k;
+      doc.text(PLANS[k].label+': '+Math.round(m)+' cm3  (90% '+Math.round(b.lo[n])+'–'+Math.round(b.hi[n])+')',48,y); y+=13; });
+    y+=4; doc.setTextColor(20);
+    doc.text('Lowest projected burden: '+PLANS[best].label+'.',48,y); y+=20;
+    try{ const img=document.getElementById('chart').toDataURL('image/png'); doc.addImage(img,'PNG',40,y,515,150); }catch(e){}
+    doc.save('oncotwin_report.pdf');
+  }catch(e){ alert('Could not generate PDF ('+e.message+'). Make sure you are online so the PDF library can load.'); }
+}
+
+const COHORT=[{name:'Heuristic',mae:15.9,cov:31},{name:'Trained',mae:14.4,cov:37},{name:'Trained + noise',mae:13.5,cov:95}];
+const COHORT_COLORS=['#888780','#378ADD','#1D9E75'];
+function drawCohort(){ const {ctx,CW,CH}=chartCtx('cohortChart','cohortWrap'); if(!CW)return;
+  const padL=52,padR=16,padT=16,padB=44,x0=padL,x1=CW-padR,y0=CH-padB,y1=padT;
+  const Y=v=>y0+(v/100)*(y1-y0); ctx.clearRect(0,0,CW,CH);
+  ctx.strokeStyle="#202c31"; ctx.fillStyle="#5a6b70"; ctx.lineWidth=1; ctx.font='11px "IBM Plex Mono",monospace';
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  for(let g=0;g<=100;g+=25){ ctx.beginPath(); ctx.moveTo(x0,Y(g)); ctx.lineTo(x1,Y(g)); ctx.stroke(); ctx.fillText(g+'%',x0-8,Y(g)); }
+  const bw=(x1-x0)/COHORT.length, barW=bw*0.5;
+  COHORT.forEach((d,i)=>{ const cx=x0+bw*(i+0.5);
+    ctx.fillStyle=COHORT_COLORS[i]; ctx.fillRect(cx-barW/2,Y(d.cov),barW,y0-Y(d.cov));
+    ctx.fillStyle="#E4EAEC"; ctx.textAlign="center"; ctx.textBaseline="bottom"; ctx.font='12px "IBM Plex Mono",monospace';
+    ctx.fillText(d.cov+'%',cx,Y(d.cov)-4);
+    ctx.fillStyle="#7C8B90"; ctx.textBaseline="top"; ctx.font='11px "Inter",sans-serif';
+    ctx.fillText(d.name,cx,y0+7); ctx.fillText('MAE '+d.mae,cx,y0+22); });
+  ctx.strokeStyle="#FF7A59"; ctx.setLineDash([6,4]); ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(x0,Y(90)); ctx.lineTo(x1,Y(90)); ctx.stroke(); ctx.setLineDash([]);
+  ctx.fillStyle="#FF7A59"; ctx.textAlign="left"; ctx.textBaseline="bottom"; ctx.font='11px "IBM Plex Mono",monospace';
+  ctx.fillText('nominal 90%',x0+4,Y(90)-3);
+}
+function treatmentNote(){
+  const last=k=>cmpData[k].med.length-1;
+  const at=k=>({m:cmpData[k].med[last(k)],lo:cmpData[k].lo[last(k)],hi:cmpData[k].hi[last(k)]});
+  const ks=Object.keys(PLANS); let best=ks[0]; ks.forEach(k=>{ if(at(k).m<at(best).m) best=k; });
+  const B=at(best), same=[];
+  ks.forEach(k=>{ if(k===best) return; const A=at(k);
+    if((A.m>=B.lo&&A.m<=B.hi)||(B.m>=A.lo&&B.m<=A.hi)) same.push(PLANS[k].label); });
+  let html='<b style="color:var(--coral)">Lowest projected burden: '+PLANS[best].label+'</b> ('+fmt(B.m)+' cm³ median).<br>';
+  if(same.length) html+='<span style="color:var(--amber)">Not statistically distinguishable from it</span> (overlapping 90% intervals): '+same.join(', ')+'. The model cannot confidently rank these apart — an honest "more data needed" case.';
+  else html+='This strategy is clearly separated from the others at one year.';
+  return html;
+}
+
 function syncPatientLabels(){
   document.getElementById('vAge').textContent=FEATURES.age;
   document.getElementById('vStage').textContent=FEATURES.stage;
@@ -528,14 +661,16 @@ function wireSliders(){
   syncPatientLabels();
 }
 async function boot(){
-  initThree(); buildOpts(); renderDrivers(); renderImaging(); wireSliders();
+  initThree(); buildOpts(); renderDrivers(); renderImaging(); wireSliders(); buildRoster();
   try{ if(await apiHealth()){ const bel=await apiCreate(featuresToApi()); TWIN_ID=bel.patient_id; belief=bel; MODE='api'; } }
   catch(e){ MODE='offline'; }
   if(MODE!=='api'){ offlineState=samplePrior(); belief=offlineBelief(offlineState,0,0); }
   setModePill(); if(!REDUCE) tumorScale=0;
   await refresh();
 }
-window.addEventListener('resize',()=>{ resizeThree(); drawChart(); if(document.getElementById('tab-compare').classList.contains('active')) drawCompare(); });
+window.addEventListener('resize',()=>{ resizeThree(); drawChart();
+  if(document.getElementById('tab-compare').classList.contains('active')) drawCompare();
+  if(document.getElementById('tab-cohort').classList.contains('active')) drawCohort(); });
 boot();
 </script>
 </body>

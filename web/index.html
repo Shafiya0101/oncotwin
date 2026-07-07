@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OncoTwin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E1416; --panel:#161E21; --panel-2:#111A1D; --line:#26343A;
+    --text:#E4EAEC; --muted:#7C8B90; --faint:#4A5B61;
+    --cyan:#35D0BA; --cyan-dim:#1c6d63; --coral:#FF7A59; --coral-dim:#7d3826; --amber:#F2B441;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--ink); color:var(--text); font-family:"Inter",system-ui,sans-serif;
+    font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1180px; margin:0 auto; padding:20px 20px 48px}
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  .status{display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:14px 18px;
+    border:1px solid var(--line); border-radius:12px;
+    background:linear-gradient(180deg,var(--panel),var(--panel-2))}
+  .brand{font-family:"Space Grotesk",sans-serif; font-weight:600; font-size:18px}
+  .brand span{color:var(--cyan)}
+  .pid{font-family:"IBM Plex Mono",monospace; color:var(--muted); font-size:13px}
+  .modepill{font-family:"IBM Plex Mono",monospace; font-size:11px; padding:4px 9px; border-radius:20px;
+    border:1px solid var(--line); color:var(--muted)}
+  .modepill.live{color:var(--cyan); border-color:var(--cyan-dim)}
+  .modepill.live::before{content:"● "}
+  .modepill.offline::before{content:"○ "}
+  .chips{margin-left:auto; display:flex; gap:10px; flex-wrap:wrap}
+  .chip{display:flex; flex-direction:column; gap:2px; padding:7px 12px; border:1px solid var(--line);
+    border-radius:9px; background:#0d1517; min-width:96px}
+  .chip .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+  .chip .v{font-family:"IBM Plex Mono",monospace; font-size:15px}
+  .chip.alert .v{color:var(--amber)}
+  #verChip .v{color:var(--cyan)}
+
+  .grid{display:grid; grid-template-columns:1.35fr 1fr; gap:16px; margin-top:16px}
+  .card{border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden}
+  .card h2{margin:0; padding:14px 18px 0; font-family:"Space Grotesk",sans-serif; font-size:13px;
+    font-weight:500; text-transform:uppercase; letter-spacing:.12em; color:var(--muted)}
+
+  .stage-card{position:relative; min-height:420px; display:flex; flex-direction:column}
+  #stage{flex:1; min-height:360px; position:relative}
+  #stage canvas{display:block}
+  .readout{position:absolute; left:18px; bottom:16px; pointer-events:none}
+  .readout .day{font-family:"IBM Plex Mono",monospace; font-size:13px; color:var(--muted)}
+  .readout .vol{font-family:"IBM Plex Mono",monospace; font-size:34px; color:var(--coral); line-height:1.05; margin-top:2px}
+  .readout .vol small{font-size:15px; color:var(--muted)}
+  .legend3d{position:absolute; right:18px; top:16px; text-align:right; pointer-events:none;
+    font-size:11px; color:var(--faint); line-height:1.7}
+  .legend3d b{color:var(--cyan); font-weight:500}
+  .legend3d i{color:var(--coral); font-style:normal; font-weight:500}
+
+  .controls{padding:14px 18px 18px}
+  .opt{display:flex; align-items:center; gap:12px; padding:11px 12px; cursor:pointer; border:1px solid var(--line);
+    border-radius:9px; margin-top:8px; background:#0f181b; transition:border-color .15s, background .15s}
+  .opt:hover{border-color:var(--cyan-dim)}
+  .opt.sel{border-color:var(--cyan); background:#0c211f}
+  .opt .dot{width:11px; height:11px; border-radius:50%; border:2px solid var(--faint); flex:none;
+    transition:border-color .15s, background .15s}
+  .opt.sel .dot{border-color:var(--cyan); background:var(--cyan)}
+  .opt .lab{font-weight:500}
+  .opt .sub{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted)}
+
+  .fc{display:flex; gap:18px; padding:2px 18px 16px}
+  .fc .block .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
+  .fc .block .v{font-family:"IBM Plex Mono",monospace; font-size:22px; margin-top:2px}
+  .fc .v.med{color:var(--coral)}
+  .fc .v.ci{font-size:15px}
+
+  .timeline{margin-top:16px; padding:16px 20px; border:1px solid var(--line); border-radius:12px; background:var(--panel)}
+  .timeline .row{display:flex; align-items:center; gap:14px}
+  .timeline label{font-family:"Space Grotesk",sans-serif; font-size:12px; text-transform:uppercase;
+    letter-spacing:.12em; color:var(--muted); white-space:nowrap}
+  input[type=range]{-webkit-appearance:none; appearance:none; height:4px; border-radius:2px; background:var(--line); flex:1; outline:none}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%;
+    background:var(--cyan); cursor:pointer; border:3px solid var(--ink); box-shadow:0 0 0 1px var(--cyan)}
+  input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--cyan); cursor:pointer; border:3px solid var(--ink)}
+  .tspan{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); width:64px; text-align:right}
+
+  .chart-card{margin-top:16px}
+  #chartWrap{padding:6px 10px 14px}
+  #chart{width:100%; display:block}
+  .chart-legend{display:flex; gap:18px; padding:0 18px 14px; flex-wrap:wrap; font-size:12px; color:var(--muted)}
+  .chart-legend .it{display:flex; align-items:center; gap:7px}
+  .sw{width:16px; height:3px; border-radius:2px}
+
+  .action{margin-top:16px; padding:16px 18px; border:1px solid var(--line); border-radius:12px;
+    background:linear-gradient(180deg,var(--panel),var(--panel-2)); display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+  .action .txt{max-width:520px}
+  .action .txt .t{font-family:"Space Grotesk",sans-serif; font-weight:500}
+  .action .txt .d{color:var(--muted); font-size:13px; margin-top:2px}
+  button.scan{margin-left:auto; font-family:"Space Grotesk",sans-serif; font-weight:600; font-size:14px;
+    color:var(--ink); background:var(--cyan); border:none; cursor:pointer; padding:12px 20px; border-radius:9px;
+    transition:transform .1s, background .15s}
+  button.scan:hover{background:#4fe0cb}
+  button.scan:active{transform:translateY(1px)}
+  button.scan:disabled{background:var(--faint); color:var(--panel); cursor:not-allowed}
+  .toast{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--cyan); opacity:0; transition:opacity .3s}
+  .toast.show{opacity:1}
+
+  footer{margin-top:22px; text-align:center; color:var(--faint); font-size:12px}
+  footer b{color:var(--muted); font-weight:500}
+
+  @media (max-width:900px){ .grid{grid-template-columns:1fr} .chips{width:100%; margin-left:0} }
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="status">
+    <div class="brand">Onco<span>Twin</span></div>
+    <div class="pid">PT · 63F · NSCLC adenocarcinoma · stage III</div>
+    <span class="modepill offline" id="modePill">connecting…</span>
+    <div class="chips">
+      <div class="chip"><span class="k">Doubling time</span><span class="v" id="chDbl">— d</span></div>
+      <div class="chip"><span class="k">Chemo response</span><span class="v" id="chResp">—</span></div>
+      <div class="chip" id="verChip"><span class="k">Twin version</span><span class="v" id="chVer">v0</span></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="card stage-card">
+      <h2>Tumor volume · live</h2>
+      <div id="stage">
+        <div class="legend3d"><b>scan field</b><br><i>tumor burden</i></div>
+        <div class="readout">
+          <div class="day mono" id="roDay">day 0</div>
+          <div class="vol" id="roVol">42<small> cm³</small></div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Treatment strategy</h2>
+      <div class="controls" id="opts"></div>
+      <div class="fc">
+        <div class="block"><div class="k">Median @ day 365</div><div class="v med" id="fcMed">—</div></div>
+        <div class="block"><div class="k">90% interval</div><div class="v ci" id="fcCI">—</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="timeline">
+    <div class="row">
+      <label for="tl">Timeline</label>
+      <input id="tl" type="range" min="0" max="365" value="0" step="1">
+      <span class="tspan" id="tlVal">day 0</span>
+    </div>
+  </div>
+
+  <div class="card chart-card">
+    <h2>Forecast trajectory</h2>
+    <div id="chartWrap"><canvas id="chart" height="300"></canvas></div>
+    <div class="chart-legend">
+      <div class="it"><span class="sw" style="background:var(--coral)"></span>median forecast</div>
+      <div class="it"><span class="sw" style="background:var(--coral-dim)"></span>90% interval</div>
+      <div class="it"><span class="sw" style="background:var(--faint)"></span>prior (pre-recalibration)</div>
+      <div class="it"><span class="sw" style="background:var(--cyan)"></span>follow-up scan</div>
+    </div>
+  </div>
+
+  <div class="action">
+    <div class="txt">
+      <div class="t">Simulate a follow-up scan</div>
+      <div class="d">Feed the twin a new measurement of this patient. It recalibrates its belief and the forecast snaps toward reality — the thing a static prediction can't do.</div>
+    </div>
+    <span class="toast" id="toast"></span>
+    <button class="scan" id="scanBtn">Simulate follow-up scan</button>
+  </div>
+
+  <footer><b>Illustrative model.</b> Parameters are interpretable clinical priors, not trained on patient data. Not a medical device.</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===================== config & shared engine (offline + truth) ===================== */
+const API_BASE = new URLSearchParams(location.search).get('api') || 'http://localhost:8000';
+const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const V_FLOOR = 1e-3;
+const FEATURES = { baseline:42, ki67:0.35, stage:3, egfr:false, het:0.6 };
+const TRUE = { r:0.024, K:800, cs:0.028, rs:0.030 };   // hidden reality for the scan demo
+const N = 80;
+const TGRID = []; for(let d=0; d<=365; d+=2) TGRID.push(d);
+const PLANS = {
+  none:      { label:"No treatment",         courses:[] },
+  standard:  { label:"Chemo (standard)",     courses:[{kind:"chemo",s:30,e:200,i:1.0}] },
+  intensive: { label:"Chemo (intensive)",    courses:[{kind:"chemo",s:30,e:200,i:1.6}] },
+  radio:     { label:"Chemo + radiotherapy", courses:[{kind:"chemo",s:30,e:200,i:1.0},{kind:"radio",s:30,e:75,i:1.0}] },
+};
+function planToApi(key){
+  const p=PLANS[key];
+  return {name:p.label, courses:p.courses.map(c=>({kind:c.kind==="chemo"?"chemo":"radiotherapy",start_day:c.s,end_day:c.e,intensity:c.i}))};
+}
+function gauss(m,s){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
+  return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+function samplePrior(){
+  const f=FEATURES, ps=[], ws=[];
+  const rMean=0.010+0.004*f.ki67+0.003*(f.stage-1)+0.004*f.het;
+  const kMean=Math.max(f.baseline*14,200);
+  const csMean=0.055+0.020*(f.egfr?1:0)+0.030*f.ki67;
+  const rsMean=0.060-0.020*f.het;
+  for(let i=0;i<N;i++){
+    ps.push({ r:Math.max(1e-4,gauss(rMean,0.18*rMean)), K:Math.exp(gauss(Math.log(kMean),0.45)),
+      cs:Math.max(1e-4,gauss(csMean,0.35*csMean)), rs:Math.max(1e-4,gauss(rsMean,0.35*Math.abs(rsMean))) });
+    ws.push(1/N);
+  }
+  return {ps,ws};
+}
+function killRate(t,p,courses){ let r=0; for(const c of courses){ if(t>=c.s&&t<c.e) r+=(c.kind==="chemo"?p.cs:p.rs)*c.i; } return r; }
+function simulate(v0,p,courses,times){
+  const out=[]; let v=v0,t=0,si=0; const tmax=times[times.length-1];
+  while(si<times.length&&times[si]<=0){ out.push(v0); si++; }
+  while(t<tmax){ const vv=Math.max(v,V_FLOOR);
+    const dv=p.r*vv*Math.log(p.K/vv)-killRate(t,p,courses)*vv;
+    v=Math.max(v+dv,V_FLOOR); t+=1;
+    while(si<times.length&&times[si]<=t){ out.push(v); si++; } }
+  while(out.length<times.length) out.push(v);
+  return out;
+}
+function wq(sorted,w,q){ let c=0; for(let i=0;i<sorted.length;i++){ c+=w[i]; if(c>=q) return sorted[i].v; } return sorted[sorted.length-1].v; }
+function offlineForecast(state,courses){
+  const traj=state.ps.map(p=>simulate(FEATURES.baseline,p,courses,TGRID));
+  const med=[],lo=[],hi=[];
+  for(let j=0;j<TGRID.length;j++){
+    const col=state.ps.map((p,i)=>({v:traj[i][j],w:state.ws[i]})).sort((a,b)=>a.v-b.v);
+    const w=col.map(c=>c.w); med.push(wq(col,w,.5)); lo.push(wq(col,w,.05)); hi.push(wq(col,w,.95));
+  }
+  return {t:TGRID.slice(),med,lo,hi};
+}
+function medianParticle(state){ let r=0,K=0,cs=0,rs=0,W=0;
+  state.ps.forEach((p,i)=>{const w=state.ws[i]; r+=p.r*w;K+=p.K*w;cs+=p.cs*w;rs+=p.rs*w;W+=w;});
+  return {r:r/W,K:K/W,cs:cs/W,rs:rs/W}; }
+function offlineBelief(state,version,nobs){
+  const mp=medianParticle(state);
+  return {version, n_observations:nobs, growth_rate_per_day:mp.r,
+    implied_doubling_time_days:Math.log(2)/mp.r, chemo_sensitivity:mp.cs, radio_sensitivity:mp.rs};
+}
+function offlineRecalibrate(state,courses,obs){
+  const times=obs.map(o=>o.day);
+  const logw=state.ws.map(w=>Math.log(w+1e-300));
+  state.ps.forEach((p,i)=>{ const pred=simulate(FEATURES.baseline,p,courses,times);
+    let ll=0; for(let k=0;k<obs.length;k++){ const d=(pred[k]-obs[k].vol)/obs[k].sd; ll+=-0.5*d*d; } logw[i]+=ll; });
+  const mx=Math.max(...logw); const w=logw.map(x=>Math.exp(x-mx)); const s=w.reduce((a,b)=>a+b,0);
+  const wn=w.map(x=>x/s); const cdf=[]; let c=0; wn.forEach(x=>{c+=x;cdf.push(c);});
+  const start=Math.random()/N, np=[];
+  for(let i=0;i<N;i++){ const pos=start+i/N; let j=0; while(j<N-1&&cdf[j]<pos)j++; const sp=state.ps[j];
+    np.push({ r:Math.max(1e-5,sp.r+gauss(0,.02*.004)), K:Math.max(1e-5,sp.K+gauss(0,.02*120)),
+      cs:Math.max(1e-5,sp.cs+gauss(0,.02*.02)), rs:Math.max(1e-5,sp.rs+gauss(0,.02*.02)) }); }
+  state.ps=np; state.ws=new Array(N).fill(1/N);
+}
+
+/* ===================== API client ===================== */
+async function apiHealth(){ const r=await fetch(API_BASE+'/health',{signal:AbortSignal.timeout(2500)}); return r.ok; }
+async function apiCreate(){ const r=await fetch(API_BASE+'/twins',{method:'POST',headers:{'content-type':'application/json'},
+  body:JSON.stringify({patient_id:'PT-'+Math.random().toString(36).slice(2,8).toUpperCase(),features:{}})});
+  if(!r.ok) throw new Error('create'); return r.json(); }
+async function apiForecast(id,key){ const r=await fetch(API_BASE+'/twins/'+id+'/forecast',{method:'POST',
+  headers:{'content-type':'application/json'}, body:JSON.stringify({plan:planToApi(key),horizon_days:365,step:2})});
+  const d=await r.json(); return {t:d.t,med:d.median,lo:d.lower,hi:d.upper}; }
+async function apiMeasure(id,day,vol){ const r=await fetch(API_BASE+'/twins/'+id+'/measurements',{method:'POST',
+  headers:{'content-type':'application/json'}, body:JSON.stringify([{time_days:day,volume_cm3:vol}])}); return r.json(); }
+
+/* ===================== app state ===================== */
+let MODE='offline', TWIN_ID=null, offlineState=null;
+let currentPlan='standard', currentDay=0, observations=[], version=0, priorBand=null;
+let fc={t:TGRID.slice(),med:TGRID.map(()=>42),lo:TGRID.map(()=>42),hi:TGRID.map(()=>42)};
+let belief={version:0,n_observations:0,growth_rate_per_day:0.02,implied_doubling_time_days:35,chemo_sensitivity:0.06,radio_sensitivity:0.05};
+
+function interp(t,v,day){ if(day<=t[0])return v[0]; if(day>=t[t.length-1])return v[v.length-1];
+  for(let i=1;i<t.length;i++){ if(t[i]>=day){ const f=(day-t[i-1])/(t[i]-t[i-1]); return v[i-1]+f*(v[i]-v[i-1]); } } return v[v.length-1]; }
+
+async function computeForecast(key){
+  if(MODE==='api'){ try{ return await apiForecast(TWIN_ID,key); }catch(e){ MODE='offline'; setModePill(); } }
+  return offlineForecast(offlineState,PLANS[key].courses);
+}
+
+/* ===================== 3D scene ===================== */
+const stageEl=document.getElementById('stage');
+let renderer,scene,camera,tumor,field,tumorTargetScale=0.5,tumorScale=0.5;
+function volToScale(v){ return Math.min(2.1,Math.max(0.22,0.9*Math.cbrt(v/200))); }
+function initThree(){
+  const w=stageEl.clientWidth,h=stageEl.clientHeight;
+  renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(w,h); stageEl.appendChild(renderer.domElement);
+  scene=new THREE.Scene(); camera=new THREE.PerspectiveCamera(45,w/h,0.1,100); camera.position.set(0,0,5.6);
+  field=new THREE.Mesh(new THREE.IcosahedronGeometry(2.55,1),
+    new THREE.MeshBasicMaterial({color:0x35D0BA,wireframe:true,transparent:true,opacity:0.10})); scene.add(field);
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(2.56,32,24),
+    new THREE.MeshBasicMaterial({color:0x35D0BA,transparent:true,opacity:0.03})));
+  const geo=new THREE.SphereGeometry(1,96,64); const pos=geo.attributes.position;
+  const noise=(x,y,z)=>0.5*Math.sin(2.5*x+1.3)*Math.sin(2.9*y)*Math.sin(2.2*z)+0.25*Math.sin(5.1*y+0.7)*Math.sin(4.3*z);
+  for(let i=0;i<pos.count;i++){ const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i); const d=1+0.12*noise(x,y,z); pos.setXYZ(i,x*d,y*d,z*d); }
+  geo.computeVertexNormals();
+  tumor=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xFF7A59,emissive:0xFF4A2A,emissiveIntensity:0.35,roughness:0.55,metalness:0.05}));
+  scene.add(tumor);
+  const rim=new THREE.Mesh(geo.clone(),new THREE.MeshBasicMaterial({color:0xFF9A7A,transparent:true,opacity:0.12,side:THREE.BackSide}));
+  rim.scale.setScalar(1.08); tumor.add(rim);
+  scene.add(new THREE.AmbientLight(0x9fb4ba,0.6));
+  const key=new THREE.DirectionalLight(0xffffff,0.9); key.position.set(3,4,5); scene.add(key);
+  const warm=new THREE.PointLight(0xFF7A59,0.7,20); warm.position.set(-4,-2,3); scene.add(warm);
+  const cool=new THREE.PointLight(0x35D0BA,0.5,20); cool.position.set(4,-3,-4); scene.add(cool);
+  animate();
+}
+function animate(){ requestAnimationFrame(animate);
+  tumorScale+=(tumorTargetScale-tumorScale)*(REDUCE?1:0.12);
+  if(tumor){ tumor.scale.setScalar(tumorScale);
+    if(!REDUCE){ tumor.rotation.y+=0.0035; tumor.rotation.x+=0.0012; field.rotation.y-=0.0016; }
+    tumor.material.emissiveIntensity=0.30+0.08*Math.sin(performance.now()*0.0016); }
+  renderer.render(scene,camera);
+}
+function resizeThree(){ if(!renderer)return; const w=stageEl.clientWidth,h=stageEl.clientHeight;
+  renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); }
+
+/* ===================== chart ===================== */
+const cv=document.getElementById('chart'),ctx=cv.getContext('2d'); let CW=0,CH=300;
+function resizeChart(){ const wrap=document.getElementById('chartWrap'); CW=wrap.clientWidth-20;
+  const dpr=Math.min(devicePixelRatio,2);
+  cv.style.width=CW+'px'; cv.style.height=CH+'px'; cv.width=CW*dpr; cv.height=CH*dpr;
+  ctx.setTransform(dpr,0,0,dpr,0,0); drawChart(); }
+function yMax(){ let m=Math.max(...fc.hi); if(priorBand)m=Math.max(m,Math.max(...priorBand.hi)); return Math.max(200,Math.ceil(m/200)*200); }
+function drawChart(){ if(!CW)return;
+  const padL=52,padR=16,padT=14,padB=28,x0=padL,x1=CW-padR,y0=CH-padB,y1=padT,ymax=yMax();
+  const X=d=>x0+(Math.min(d,365)/365)*(x1-x0), Y=v=>y0+(v/ymax)*(y1-y0);
+  ctx.clearRect(0,0,CW,CH);
+  ctx.strokeStyle="#202c31"; ctx.fillStyle="#5a6b70"; ctx.lineWidth=1; ctx.font='11px "IBM Plex Mono",monospace';
+  ctx.textAlign="right"; ctx.textBaseline="middle";
+  for(let g=0;g<=ymax;g+=ymax/4){ ctx.beginPath(); ctx.moveTo(x0,Y(g)); ctx.lineTo(x1,Y(g)); ctx.stroke(); ctx.fillText(g.toFixed(0),x0-8,Y(g)); }
+  ctx.textAlign="center"; ctx.textBaseline="top"; for(let d=0;d<=365;d+=73) ctx.fillText(d,X(d),y0+7);
+  ctx.fillStyle="rgba(53,208,186,0.06)"; for(const c of PLANS[currentPlan].courses) ctx.fillRect(X(c.s),y1,X(c.e)-X(c.s),y0-y1);
+  const band=(b,fill)=>{ ctx.beginPath(); ctx.moveTo(X(b.t[0]),Y(b.lo[0]));
+    for(let i=1;i<b.t.length;i++) ctx.lineTo(X(b.t[i]),Y(b.lo[i]));
+    for(let i=b.t.length-1;i>=0;i--) ctx.lineTo(X(b.t[i]),Y(b.hi[i])); ctx.closePath(); ctx.fillStyle=fill; ctx.fill(); };
+  const line=(b,arr,color,w,dash)=>{ ctx.beginPath(); ctx.setLineDash(dash||[]);
+    for(let i=0;i<b.t.length;i++){ const px=X(b.t[i]),py=Y(arr[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+    ctx.strokeStyle=color; ctx.lineWidth=w; ctx.stroke(); ctx.setLineDash([]); };
+  if(priorBand){ band(priorBand,"rgba(74,91,97,0.16)"); line(priorBand,priorBand.med,"#4A5B61",1.4,[5,4]); }
+  band(fc,"rgba(255,122,89,0.16)"); line(fc,fc.med,"#FF7A59",2.4);
+  for(const o of observations){ ctx.beginPath(); ctx.arc(X(o.day),Y(o.vol),4.5,0,7); ctx.fillStyle="#35D0BA"; ctx.fill();
+    ctx.lineWidth=2; ctx.strokeStyle="#0E1416"; ctx.stroke(); }
+  ctx.strokeStyle="rgba(228,234,236,0.35)"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+  ctx.beginPath(); ctx.moveTo(X(currentDay),y1); ctx.lineTo(X(currentDay),y0); ctx.stroke(); ctx.setLineDash([]);
+  ctx.beginPath(); ctx.arc(X(currentDay),Y(interp(fc.t,fc.med,currentDay)),4,0,7); ctx.fillStyle="#FF7A59"; ctx.fill();
+}
+
+/* ===================== UI ===================== */
+function setModePill(){ const el=document.getElementById('modePill');
+  el.className='modepill '+(MODE==='api'?'live':'offline'); el.textContent=MODE==='api'?'live API':'offline demo'; }
+function buildOpts(){ const box=document.getElementById('opts'); box.innerHTML="";
+  for(const key of Object.keys(PLANS)){ const p=PLANS[key]; const el=document.createElement('div');
+    el.className="opt"+(key===currentPlan?" sel":"");
+    el.innerHTML='<span class="dot"></span><span class="lab">'+p.label+'</span><span class="sub">'+(key==="none"?"baseline":"scenario")+'</span>';
+    el.onclick=async()=>{ currentPlan=key; buildOpts(); await refresh(); }; box.appendChild(el); } }
+function fmt(n){ return Math.round(n).toLocaleString(); }
+function updateBeliefUI(){ document.getElementById('chDbl').textContent=Math.round(belief.implied_doubling_time_days)+" d";
+  const resp=belief.chemo_sensitivity>0.05?"responder":belief.chemo_sensitivity>0.03?"partial":"resistant";
+  document.getElementById('chResp').textContent=resp;
+  document.getElementById('chResp').parentElement.classList.toggle('alert',resp!=="responder");
+  document.getElementById('chVer').textContent="v"+belief.version; }
+function updateDay(day){ currentDay=day; const vol=interp(fc.t,fc.med,day);
+  tumorTargetScale=volToScale(vol);
+  document.getElementById('roDay').textContent="day "+day;
+  document.getElementById('roVol').innerHTML=fmt(vol)+'<small> cm³</small>';
+  document.getElementById('tlVal').textContent="day "+day; }
+async function refresh(){ fc=await computeForecast(currentPlan); const last=fc.med.length-1;
+  document.getElementById('fcMed').textContent=fmt(fc.med[last])+" cm³";
+  document.getElementById('fcCI').textContent=fmt(fc.lo[last])+"–"+fmt(fc.hi[last]);
+  updateDay(currentDay); drawChart(); updateBeliefUI(); }
+
+document.getElementById('tl').addEventListener('input',e=>{ updateDay(+e.target.value); drawChart(); });
+document.getElementById('scanBtn').addEventListener('click',async()=>{
+  if(observations.length>=3)return;
+  if(!priorBand) priorBand={t:fc.t.slice(),med:fc.med.slice(),lo:fc.lo.slice(),hi:fc.hi.slice()};
+  const day=[60,120,180][observations.length];
+  const trueVol=simulate(FEATURES.baseline,TRUE,PLANS[currentPlan].courses,[day])[0];
+  const vol=Math.max(1,trueVol+gauss(0,2)); observations.push({day,vol,sd:2.0});
+  if(MODE==='api'){ try{ belief=await apiMeasure(TWIN_ID,day,vol); }catch(e){ MODE='offline'; setModePill(); } }
+  if(MODE!=='api'){ offlineRecalibrate(offlineState,PLANS[currentPlan].courses,observations); version++; belief=offlineBelief(offlineState,version,observations.length); }
+  await refresh();
+  const toast=document.getElementById('toast');
+  toast.textContent='scan @ day '+day+': '+fmt(vol)+' cm³ · recalibrated to v'+belief.version;
+  toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3200);
+  if(observations.length>=3){ const b=document.getElementById('scanBtn'); b.disabled=true; b.textContent="3 scans assimilated"; }
+});
+
+/* ===================== boot ===================== */
+async function boot(){
+  initThree(); buildOpts(); resizeChart();
+  try{ if(await apiHealth()){ const bel=await apiCreate(); TWIN_ID=bel.patient_id; belief=bel; MODE='api'; } }
+  catch(e){ MODE='offline'; }
+  if(MODE!=='api'){ offlineState=samplePrior(); belief=offlineBelief(offlineState,0,0); }
+  setModePill();
+  if(!REDUCE) tumorScale=0;
+  await refresh();
+}
+window.addEventListener('resize',()=>{ resizeThree(); resizeChart(); });
+boot();
+</script>
+</body>
+</html>

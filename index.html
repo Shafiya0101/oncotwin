@@ -276,6 +276,18 @@
         accuracy. Reproduce on your machine with <b>make analysis</b>.
       </div>
     </div>
+    <div class="card" style="margin-top:16px">
+      <h2>Real-data check · NSCLC-Radiomics</h2>
+      <div class="prose">
+        Tested against <b>real patient survival</b> (TCIA NSCLC-Radiomics, 399 patients):
+        the twin's risk scored a concordance index of
+        <b style="color:var(--amber)">0.505</b> — essentially chance. An honest negative
+        result: the growth model was not trained on survival, and the prognostic signal
+        lives in imaging features (tumor volume, heterogeneity) not yet loaded per patient.
+        Real CT ingestion works; extracting tumor radiomics across the cohort is the next
+        step. Reproduce with <b>python analysis/real_data_analysis.py</b>.
+      </div>
+    </div>
   </div>
 
   <footer><b>Illustrative model.</b> Parameters are interpretable clinical priors, not trained on patient data. Not a medical device.</footer>

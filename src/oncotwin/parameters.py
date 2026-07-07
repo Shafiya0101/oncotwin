@@ -55,3 +55,43 @@ class HeuristicEstimator:
         particles = np.column_stack([r, K, chemo, radio])
         weights = np.full(n_particles, 1.0 / n_particles)
         return ParameterEnsemble(particles, weights)
+
+
+class LearnedEstimator:
+    """A trained estimator: regresses patient features -> parameter posteriors.
+
+    Fit on a cohort whose parameters are known. For synthetic patients those are
+    the generating truth; for real patients you would first fit each patient's
+    parameters from their trajectory, then regress features -> parameters here.
+
+    The key difference from the heuristic version: the spread of each parameter
+    is *learned from the data's residuals* rather than hand-set, which is what
+    makes the forecast intervals honest (see analysis/run_analysis.py).
+    """
+
+    def __init__(self, seed: int = 0):
+        self.beta = None            # (n_features, 4) log-space coefficients
+        self.resid = None           # (4,) log-space residual std per parameter
+        self._rng = np.random.default_rng(seed)
+
+    @staticmethod
+    def _row(f: PatientFeatures) -> np.ndarray:
+        return np.array([1.0, f.age / 100.0, float(f.stage), f.ki67,
+                         1.0 if f.egfr_mutation else 0.0, f.radiomic_heterogeneity,
+                         f.baseline_volume_cm3 / 100.0])
+
+    def fit(self, records) -> "LearnedEstimator":
+        X = np.array([self._row(r.features) for r in records])
+        Y = np.log(np.array([r.true_params for r in records]))     # (n, 4)
+        self.beta, *_ = np.linalg.lstsq(X, Y, rcond=None)
+        self.resid = (Y - X @ self.beta).std(axis=0)
+        return self
+
+    def estimate(self, f: PatientFeatures, n_particles: int = 400) -> ParameterEnsemble:
+        if self.beta is None:
+            raise RuntimeError("LearnedEstimator must be .fit() before use")
+        mu = self._row(f) @ self.beta                              # (4,)
+        cols = [np.exp(self._rng.normal(mu[j], max(self.resid[j], 1e-3), n_particles))
+                for j in range(4)]
+        particles = np.column_stack(cols).clip(1e-5, None)
+        return ParameterEnsemble(particles, np.full(n_particles, 1.0 / n_particles))

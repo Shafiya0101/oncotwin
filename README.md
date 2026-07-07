@@ -44,6 +44,26 @@ curve during the treatment window; the tumor regrows after it stops.
 
 ---
 
+## Results & analysis
+
+Train the parameter estimator and evaluate it end-to-end:
+
+```bash
+make analysis        # -> analysis/RESULTS.md + figures
+```
+
+This trains on a synthetic cohort, backtests the heuristic vs the trained
+estimator (assimilate 2 scans, forecast the rest), and reports forecast error,
+90%-interval coverage, and a PIT calibration diagnostic.
+
+![estimator comparison](analysis/outputs/estimator_comparison.png)
+
+Training improves accuracy and calibration, but the analysis is honest about the
+current limitation: **both estimators are still overconfident** — with only two
+scans the particle filter concentrates the ensemble and the forecast omits
+process noise, so the bands are too tight. The fixes are tracked in the roadmap.
+Full write-up: [analysis/RESULTS.md](analysis/RESULTS.md).
+
 ## Quickstart
 
 ```bash

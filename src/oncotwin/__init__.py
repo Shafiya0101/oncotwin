@@ -11,6 +11,7 @@ from .data import SyntheticCohort
 from .imaging import (
     synthetic_scan, load_volume, segment_tumor, extract_radiomics, fuse, ImagingFeatures,
 )
+from .explain import explain_drivers, Driver
 
 __version__ = "0.1.0"
 __all__ = [
@@ -18,5 +19,5 @@ __all__ = [
     "TreatmentCourse", "TreatmentKind", "TumorMeasurement", "ParameterEnsemble",
     "Forecast", "JsonTwinStore", "backtest", "BacktestResult", "SyntheticCohort",
     "synthetic_scan", "load_volume", "segment_tumor", "extract_radiomics",
-    "fuse", "ImagingFeatures",
+    "fuse", "ImagingFeatures", "explain_drivers", "Driver",
 ]

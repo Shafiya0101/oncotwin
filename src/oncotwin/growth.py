@@ -17,20 +17,31 @@ from scipy.integrate import solve_ivp
 
 from .domain import TreatmentPlan, TreatmentKind
 
-_V_FLOOR = 1e-3  # cm^3, prevents ln(K/V) blow-up as tumor shrinks
+_V_FLOOR = 1e-3       # cm^3, prevents ln(K/V) blow-up as tumor shrinks
+_AB_RATIO = 10.0      # Gy, tumor alpha/beta ratio for the linear-quadratic model
+_RESISTANCE_RATE = 0.010  # per day; chemo effect decays as resistance emerges
 
 
 def _kill_rate(t: float, params: np.ndarray, plan: TreatmentPlan | None) -> float:
-    """Instantaneous therapy-induced death rate at time t (per day)."""
+    """Instantaneous therapy-induced death rate at time t (per day).
+
+    Two pieces of real oncology beyond a flat log-kill:
+      - Acquired chemo resistance: sensitivity decays with time on a course, so
+        a tumor that responds early can escape later (a common clinical reality).
+      - Linear-quadratic radiotherapy: cell kill scales as d + d^2/(alpha/beta),
+        the standard radiobiology model, instead of a flat per-dose term.
+    """
     if plan is None:
         return 0.0
-    _, _, chemo_sens, radio_sens = params
+    chemo_sens, radio_sens = params[2], params[3]
     rate = 0.0
     for course in plan.active_courses(t):
         if course.kind is TreatmentKind.CHEMO:
-            rate += chemo_sens * course.intensity
+            resistance = np.exp(-_RESISTANCE_RATE * max(0.0, t - course.start_day))
+            rate += chemo_sens * course.intensity * resistance
         elif course.kind is TreatmentKind.RADIO:
-            rate += radio_sens * course.intensity
+            d = course.intensity
+            rate += radio_sens * (d + d * d / _AB_RATIO)
     return rate
 
 

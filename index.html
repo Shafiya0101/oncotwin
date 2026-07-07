@@ -19,7 +19,6 @@
     font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
   .wrap{max-width:1180px; margin:0 auto; padding:20px 20px 48px}
   .mono{font-family:"IBM Plex Mono",monospace}
-
   .status{display:flex; align-items:center; gap:16px; flex-wrap:wrap; padding:14px 18px;
     border:1px solid var(--line); border-radius:12px;
     background:linear-gradient(180deg,var(--panel),var(--panel-2))}
@@ -33,17 +32,23 @@
   .modepill.offline::before{content:"○ "}
   .chips{margin-left:auto; display:flex; gap:10px; flex-wrap:wrap}
   .chip{display:flex; flex-direction:column; gap:2px; padding:7px 12px; border:1px solid var(--line);
-    border-radius:9px; background:#0d1517; min-width:96px}
+    border-radius:9px; background:#0d1517; min-width:92px}
   .chip .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
   .chip .v{font-family:"IBM Plex Mono",monospace; font-size:15px}
   .chip.alert .v{color:var(--amber)}
   #verChip .v{color:var(--cyan)}
-
-  .grid{display:grid; grid-template-columns:1.35fr 1fr; gap:16px; margin-top:16px}
+  .tabs{display:flex; gap:6px; margin-top:16px}
+  .tab{font-family:"Space Grotesk",sans-serif; font-size:13px; font-weight:500; letter-spacing:.03em;
+    padding:10px 18px; border:1px solid var(--line); border-bottom:none; border-radius:10px 10px 0 0;
+    background:var(--panel-2); color:var(--muted); cursor:pointer}
+  .tab.active{background:var(--panel); color:var(--text)}
+  .tab.active span{color:var(--cyan)}
+  .panel{display:none}
+  .panel.active{display:block}
+  .grid{display:grid; grid-template-columns:1.35fr 1fr; gap:16px}
   .card{border:1px solid var(--line); border-radius:12px; background:var(--panel); overflow:hidden}
   .card h2{margin:0; padding:14px 18px 0; font-family:"Space Grotesk",sans-serif; font-size:13px;
     font-weight:500; text-transform:uppercase; letter-spacing:.12em; color:var(--muted)}
-
   .stage-card{position:relative; min-height:420px; display:flex; flex-direction:column}
   #stage{flex:1; min-height:360px; position:relative}
   #stage canvas{display:block}
@@ -55,59 +60,70 @@
     font-size:11px; color:var(--faint); line-height:1.7}
   .legend3d b{color:var(--cyan); font-weight:500}
   .legend3d i{color:var(--coral); font-style:normal; font-weight:500}
-
-  .controls{padding:14px 18px 18px}
+  .controls{padding:14px 18px 8px}
   .opt{display:flex; align-items:center; gap:12px; padding:11px 12px; cursor:pointer; border:1px solid var(--line);
     border-radius:9px; margin-top:8px; background:#0f181b; transition:border-color .15s, background .15s}
   .opt:hover{border-color:var(--cyan-dim)}
   .opt.sel{border-color:var(--cyan); background:#0c211f}
-  .opt .dot{width:11px; height:11px; border-radius:50%; border:2px solid var(--faint); flex:none;
-    transition:border-color .15s, background .15s}
+  .opt .dot{width:11px; height:11px; border-radius:50%; border:2px solid var(--faint); flex:none; transition:border-color .15s, background .15s}
   .opt.sel .dot{border-color:var(--cyan); background:var(--cyan)}
   .opt .lab{font-weight:500}
   .opt .sub{margin-left:auto; font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted)}
-
-  .fc{display:flex; gap:18px; padding:2px 18px 16px}
+  .fc{display:flex; gap:18px; padding:6px 18px 16px}
   .fc .block .k{font-size:10px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted)}
   .fc .block .v{font-family:"IBM Plex Mono",monospace; font-size:22px; margin-top:2px}
   .fc .v.med{color:var(--coral)}
   .fc .v.ci{font-size:15px}
-
+  .drivers{padding:6px 18px 18px}
+  .drow{display:flex; align-items:center; gap:10px; margin-top:9px; font-size:13px}
+  .drow .dl{width:150px; color:var(--muted); flex:none}
+  .dbar{height:14px; border-radius:3px; background:var(--coral); opacity:.85}
+  .dbar.neg{background:var(--cyan)}
+  .drow .de{font-family:"IBM Plex Mono",monospace; font-size:12px; width:64px; text-align:right}
   .timeline{margin-top:16px; padding:16px 20px; border:1px solid var(--line); border-radius:12px; background:var(--panel)}
   .timeline .row{display:flex; align-items:center; gap:14px}
-  .timeline label{font-family:"Space Grotesk",sans-serif; font-size:12px; text-transform:uppercase;
-    letter-spacing:.12em; color:var(--muted); white-space:nowrap}
+  .timeline label{font-family:"Space Grotesk",sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); white-space:nowrap}
   input[type=range]{-webkit-appearance:none; appearance:none; height:4px; border-radius:2px; background:var(--line); flex:1; outline:none}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%;
-    background:var(--cyan); cursor:pointer; border:3px solid var(--ink); box-shadow:0 0 0 1px var(--cyan)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:18px; height:18px; border-radius:50%; background:var(--cyan); cursor:pointer; border:3px solid var(--ink); box-shadow:0 0 0 1px var(--cyan)}
   input[type=range]::-moz-range-thumb{width:18px; height:18px; border-radius:50%; background:var(--cyan); cursor:pointer; border:3px solid var(--ink)}
   .tspan{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); width:64px; text-align:right}
-
   .chart-card{margin-top:16px}
-  #chartWrap{padding:6px 10px 14px}
-  #chart{width:100%; display:block}
+  #chartWrap,#cmpWrap{padding:6px 10px 14px}
+  #chart,#cmpChart{width:100%; display:block}
   .chart-legend{display:flex; gap:18px; padding:0 18px 14px; flex-wrap:wrap; font-size:12px; color:var(--muted)}
   .chart-legend .it{display:flex; align-items:center; gap:7px}
   .sw{width:16px; height:3px; border-radius:2px}
-
   .action{margin-top:16px; padding:16px 18px; border:1px solid var(--line); border-radius:12px;
     background:linear-gradient(180deg,var(--panel),var(--panel-2)); display:flex; align-items:center; gap:16px; flex-wrap:wrap}
   .action .txt{max-width:520px}
   .action .txt .t{font-family:"Space Grotesk",sans-serif; font-weight:500}
   .action .txt .d{color:var(--muted); font-size:13px; margin-top:2px}
   button.scan{margin-left:auto; font-family:"Space Grotesk",sans-serif; font-weight:600; font-size:14px;
-    color:var(--ink); background:var(--cyan); border:none; cursor:pointer; padding:12px 20px; border-radius:9px;
-    transition:transform .1s, background .15s}
+    color:var(--ink); background:var(--cyan); border:none; cursor:pointer; padding:12px 20px; border-radius:9px; transition:transform .1s, background .15s}
   button.scan:hover{background:#4fe0cb}
   button.scan:active{transform:translateY(1px)}
   button.scan:disabled{background:var(--faint); color:var(--panel); cursor:not-allowed}
   .toast{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--cyan); opacity:0; transition:opacity .3s}
   .toast.show{opacity:1}
-
+  .imgrid{display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px}
+  .imgcard{border:1px solid var(--line); border-radius:12px; background:var(--panel); padding:16px}
+  .imgcard h3{margin:0 0 10px; font-family:"Space Grotesk",sans-serif; font-size:12px; text-transform:uppercase; letter-spacing:.1em; color:var(--muted); font-weight:500}
+  .imgcard img{width:100%; border-radius:8px; display:block; background:#000}
+  table.feat{width:100%; border-collapse:collapse; font-size:13px}
+  table.feat td{padding:6px 4px; border-bottom:1px solid var(--line)}
+  table.feat td:last-child{text-align:right; font-family:"IBM Plex Mono",monospace; color:var(--text)}
+  table.feat td:first-child{color:var(--muted)}
+  .flow{margin-top:16px; padding:14px 18px; border:1px solid var(--line); border-radius:12px; background:var(--panel-2);
+    font-size:13px; color:var(--muted); font-family:"IBM Plex Mono",monospace}
+  .flow b{color:var(--cyan); font-weight:500}
+  table.cmp{width:100%; border-collapse:collapse; font-size:13px; margin-top:4px}
+  table.cmp th{text-align:left; color:var(--muted); font-weight:500; font-size:11px; text-transform:uppercase; letter-spacing:.08em; padding:8px 10px; border-bottom:1px solid var(--line)}
+  table.cmp td{padding:9px 10px; border-bottom:1px solid var(--line); font-family:"IBM Plex Mono",monospace}
+  table.cmp td:first-child{font-family:"Inter",sans-serif}
+  .dotc{display:inline-block; width:9px; height:9px; border-radius:50%; margin-right:8px; vertical-align:middle}
   footer{margin-top:22px; text-align:center; color:var(--faint); font-size:12px}
   footer b{color:var(--muted); font-weight:500}
-
-  @media (max-width:900px){ .grid{grid-template-columns:1fr} .chips{width:100%; margin-left:0} }
+  @media (max-width:900px){ .grid,.imgrid{grid-template-columns:1fr} .chips{width:100%; margin-left:0} }
   @media (prefers-reduced-motion: reduce){ *{transition:none !important} }
 </style>
 </head>
@@ -124,78 +140,117 @@
     </div>
   </div>
 
-  <div class="grid">
-    <div class="card stage-card">
-      <h2>Tumor volume · live</h2>
-      <div id="stage">
-        <div class="legend3d"><b>scan field</b><br><i>tumor burden</i></div>
-        <div class="readout">
-          <div class="day mono" id="roDay">day 0</div>
-          <div class="vol" id="roVol">42<small> cm³</small></div>
+  <div class="tabs">
+    <div class="tab active" data-tab="twin">Twin</div>
+    <div class="tab" data-tab="imaging">Imaging</div>
+    <div class="tab" data-tab="compare">Compare</div>
+  </div>
+
+  <div class="panel active" id="tab-twin">
+    <div class="grid">
+      <div class="card stage-card">
+        <h2>Tumor volume · live</h2>
+        <div id="stage">
+          <div class="legend3d"><b>scan field</b><br><i>segmented tumor</i></div>
+          <div class="readout">
+            <div class="day mono" id="roDay">day 0</div>
+            <div class="vol" id="roVol">42<small> cm³</small></div>
+          </div>
         </div>
       </div>
-    </div>
-    <div class="card">
-      <h2>Treatment strategy</h2>
-      <div class="controls" id="opts"></div>
-      <div class="fc">
-        <div class="block"><div class="k">Median @ day 365</div><div class="v med" id="fcMed">—</div></div>
-        <div class="block"><div class="k">90% interval</div><div class="v ci" id="fcCI">—</div></div>
+      <div class="card">
+        <h2>Treatment strategy</h2>
+        <div class="controls" id="opts"></div>
+        <div class="fc">
+          <div class="block"><div class="k">Median @ day 365</div><div class="v med" id="fcMed">—</div></div>
+          <div class="block"><div class="k">90% interval</div><div class="v ci" id="fcCI">—</div></div>
+        </div>
+        <h2 style="padding-top:6px">What's driving this forecast</h2>
+        <div class="drivers" id="drivers"></div>
       </div>
     </div>
-  </div>
 
-  <div class="timeline">
-    <div class="row">
-      <label for="tl">Timeline</label>
-      <input id="tl" type="range" min="0" max="365" value="0" step="1">
-      <span class="tspan" id="tlVal">day 0</span>
+    <div class="timeline">
+      <div class="row">
+        <label for="tl">Timeline</label>
+        <input id="tl" type="range" min="0" max="365" value="0" step="1">
+        <span class="tspan" id="tlVal">day 0</span>
+      </div>
+    </div>
+
+    <div class="card chart-card">
+      <h2>Forecast trajectory</h2>
+      <div id="chartWrap"><canvas id="chart" height="300"></canvas></div>
+      <div class="chart-legend">
+        <div class="it"><span class="sw" style="background:var(--coral)"></span>median forecast</div>
+        <div class="it"><span class="sw" style="background:var(--coral-dim)"></span>90% interval</div>
+        <div class="it"><span class="sw" style="background:var(--faint)"></span>prior (pre-recalibration)</div>
+        <div class="it"><span class="sw" style="background:var(--cyan)"></span>follow-up scan</div>
+      </div>
+    </div>
+
+    <div class="action">
+      <div class="txt">
+        <div class="t">Simulate a follow-up scan</div>
+        <div class="d">Feed the twin a new measurement of this patient. It recalibrates its belief and the forecast snaps toward reality — the thing a static prediction can't do.</div>
+      </div>
+      <span class="toast" id="toast"></span>
+      <button class="scan" id="scanBtn">Simulate follow-up scan</button>
     </div>
   </div>
 
-  <div class="card chart-card">
-    <h2>Forecast trajectory</h2>
-    <div id="chartWrap"><canvas id="chart" height="300"></canvas></div>
-    <div class="chart-legend">
-      <div class="it"><span class="sw" style="background:var(--coral)"></span>median forecast</div>
-      <div class="it"><span class="sw" style="background:var(--coral-dim)"></span>90% interval</div>
-      <div class="it"><span class="sw" style="background:var(--faint)"></span>prior (pre-recalibration)</div>
-      <div class="it"><span class="sw" style="background:var(--cyan)"></span>follow-up scan</div>
+  <div class="panel" id="tab-imaging">
+    <div class="imgrid">
+      <div class="imgcard"><h3>Scan · axial slice</h3><img id="imgScan" alt="scan slice"></div>
+      <div class="imgcard"><h3>Segmented tumor</h3><img id="imgOverlay" alt="segmentation overlay"></div>
+      <div class="imgcard"><h3>Radiomic features</h3><table class="feat" id="featTable"></table></div>
+    </div>
+    <div class="flow">
+      pipeline: <b>load scan</b> → <b>segment tumor</b> → <b>extract radiomics</b> → <b>fuse with clinical data</b> → patient twin. The 3D shape in the Twin tab is this segmented mesh.
     </div>
   </div>
 
-  <div class="action">
-    <div class="txt">
-      <div class="t">Simulate a follow-up scan</div>
-      <div class="d">Feed the twin a new measurement of this patient. It recalibrates its belief and the forecast snaps toward reality — the thing a static prediction can't do.</div>
+  <div class="panel" id="tab-compare">
+    <div class="card chart-card" style="margin-top:0">
+      <h2>All treatment strategies · median trajectories</h2>
+      <div id="cmpWrap"><canvas id="cmpChart" height="320"></canvas></div>
+      <div class="chart-legend" id="cmpLegend"></div>
     </div>
-    <span class="toast" id="toast"></span>
-    <button class="scan" id="scanBtn">Simulate follow-up scan</button>
+    <div class="card" style="margin-top:16px">
+      <h2>Projected outcome at 1 year</h2>
+      <div style="padding:6px 18px 18px">
+        <table class="cmp" id="cmpTable">
+          <thead><tr><th>Strategy</th><th>Median (cm³)</th><th>90% interval</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <footer><b>Illustrative model.</b> Parameters are interpretable clinical priors, not trained on patient data. Not a medical device.</footer>
 </div>
 
+<script src="assets.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-/* ===================== config & shared engine (offline + truth) ===================== */
+/* config & engine */
 const API_BASE = new URLSearchParams(location.search).get('api') || 'http://localhost:8000';
 const REDUCE = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const V_FLOOR = 1e-3;
+const V_FLOOR = 1e-3, PN = 0.003;
 const FEATURES = { baseline:42, ki67:0.35, stage:3, egfr:false, het:0.6 };
-const TRUE = { r:0.024, K:800, cs:0.028, rs:0.030 };   // hidden reality for the scan demo
+const TRUE = { r:0.024, K:800, cs:0.028, rs:0.030 };
 const N = 80;
 const TGRID = []; for(let d=0; d<=365; d+=2) TGRID.push(d);
+const PLAN_COLORS = { none:"#888780", standard:"#378ADD", intensive:"#7F77DD", radio:"#1D9E75" };
 const PLANS = {
   none:      { label:"No treatment",         courses:[] },
   standard:  { label:"Chemo (standard)",     courses:[{kind:"chemo",s:30,e:200,i:1.0}] },
   intensive: { label:"Chemo (intensive)",    courses:[{kind:"chemo",s:30,e:200,i:1.6}] },
   radio:     { label:"Chemo + radiotherapy", courses:[{kind:"chemo",s:30,e:200,i:1.0},{kind:"radio",s:30,e:75,i:1.0}] },
 };
-function planToApi(key){
-  const p=PLANS[key];
-  return {name:p.label, courses:p.courses.map(c=>({kind:c.kind==="chemo"?"chemo":"radiotherapy",start_day:c.s,end_day:c.e,intensity:c.i}))};
-}
+const AB_RATIO = 10.0, RESIST = 0.010;
+function planToApi(key){ const p=PLANS[key];
+  return {name:p.label, courses:p.courses.map(c=>({kind:c.kind==="chemo"?"chemo":"radiotherapy",start_day:c.s,end_day:c.e,intensity:c.i}))}; }
 function gauss(m,s){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random();
   return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
 function samplePrior(){
@@ -211,7 +266,11 @@ function samplePrior(){
   }
   return {ps,ws};
 }
-function killRate(t,p,courses){ let r=0; for(const c of courses){ if(t>=c.s&&t<c.e) r+=(c.kind==="chemo"?p.cs:p.rs)*c.i; } return r; }
+function killRate(t,p,courses){ let r=0;
+  for(const c of courses){ if(t>=c.s&&t<c.e){
+    if(c.kind==="chemo"){ r+=p.cs*c.i*Math.exp(-RESIST*Math.max(0,t-c.s)); }
+    else { r+=p.rs*(c.i + c.i*c.i/AB_RATIO); } } }
+  return r; }
 function simulate(v0,p,courses,times){
   const out=[]; let v=v0,t=0,si=0; const tmax=times[times.length-1];
   while(si<times.length&&times[si]<=0){ out.push(v0); si++; }
@@ -225,6 +284,9 @@ function simulate(v0,p,courses,times){
 function wq(sorted,w,q){ let c=0; for(let i=0;i<sorted.length;i++){ c+=w[i]; if(c>=q) return sorted[i].v; } return sorted[sorted.length-1].v; }
 function offlineForecast(state,courses){
   const traj=state.ps.map(p=>simulate(FEATURES.baseline,p,courses,TGRID));
+  for(let i=0;i<N;i++) for(let j=0;j<TGRID.length;j++){
+    const s=PN*Math.sqrt(TGRID[j]); traj[i][j]*=Math.exp(gauss(0,1)*s-0.5*s*s);
+  }
   const med=[],lo=[],hi=[];
   for(let j=0;j<TGRID.length;j++){
     const col=state.ps.map((p,i)=>({v:traj[i][j],w:state.ws[i]})).sort((a,b)=>a.v-b.v);
@@ -235,14 +297,11 @@ function offlineForecast(state,courses){
 function medianParticle(state){ let r=0,K=0,cs=0,rs=0,W=0;
   state.ps.forEach((p,i)=>{const w=state.ws[i]; r+=p.r*w;K+=p.K*w;cs+=p.cs*w;rs+=p.rs*w;W+=w;});
   return {r:r/W,K:K/W,cs:cs/W,rs:rs/W}; }
-function offlineBelief(state,version,nobs){
-  const mp=medianParticle(state);
-  return {version, n_observations:nobs, growth_rate_per_day:mp.r,
-    implied_doubling_time_days:Math.log(2)/mp.r, chemo_sensitivity:mp.cs, radio_sensitivity:mp.rs};
-}
+function offlineBelief(state,version,nobs){ const mp=medianParticle(state);
+  return {version,n_observations:nobs,growth_rate_per_day:mp.r,implied_doubling_time_days:Math.log(2)/mp.r,
+    chemo_sensitivity:mp.cs,radio_sensitivity:mp.rs}; }
 function offlineRecalibrate(state,courses,obs){
-  const times=obs.map(o=>o.day);
-  const logw=state.ws.map(w=>Math.log(w+1e-300));
+  const times=obs.map(o=>o.day); const logw=state.ws.map(w=>Math.log(w+1e-300));
   state.ps.forEach((p,i)=>{ const pred=simulate(FEATURES.baseline,p,courses,times);
     let ll=0; for(let k=0;k<obs.length;k++){ const d=(pred[k]-obs[k].vol)/obs[k].sd; ll+=-0.5*d*d; } logw[i]+=ll; });
   const mx=Math.max(...logw); const w=logw.map(x=>Math.exp(x-mx)); const s=w.reduce((a,b)=>a+b,0);
@@ -253,8 +312,6 @@ function offlineRecalibrate(state,courses,obs){
       cs:Math.max(1e-5,sp.cs+gauss(0,.02*.02)), rs:Math.max(1e-5,sp.rs+gauss(0,.02*.02)) }); }
   state.ps=np; state.ws=new Array(N).fill(1/N);
 }
-
-/* ===================== API client ===================== */
 async function apiHealth(){ const r=await fetch(API_BASE+'/health',{signal:AbortSignal.timeout(2500)}); return r.ok; }
 async function apiCreate(){ const r=await fetch(API_BASE+'/twins',{method:'POST',headers:{'content-type':'application/json'},
   body:JSON.stringify({patient_id:'PT-'+Math.random().toString(36).slice(2,8).toUpperCase(),features:{}})});
@@ -264,27 +321,37 @@ async function apiForecast(id,key){ const r=await fetch(API_BASE+'/twins/'+id+'/
   const d=await r.json(); return {t:d.t,med:d.median,lo:d.lower,hi:d.upper}; }
 async function apiMeasure(id,day,vol){ const r=await fetch(API_BASE+'/twins/'+id+'/measurements',{method:'POST',
   headers:{'content-type':'application/json'}, body:JSON.stringify([{time_days:day,volume_cm3:vol}])}); return r.json(); }
-
-/* ===================== app state ===================== */
 let MODE='offline', TWIN_ID=null, offlineState=null;
 let currentPlan='standard', currentDay=0, observations=[], version=0, priorBand=null;
 let fc={t:TGRID.slice(),med:TGRID.map(()=>42),lo:TGRID.map(()=>42),hi:TGRID.map(()=>42)};
 let belief={version:0,n_observations:0,growth_rate_per_day:0.02,implied_doubling_time_days:35,chemo_sensitivity:0.06,radio_sensitivity:0.05};
-
 function interp(t,v,day){ if(day<=t[0])return v[0]; if(day>=t[t.length-1])return v[v.length-1];
   for(let i=1;i<t.length;i++){ if(t[i]>=day){ const f=(day-t[i-1])/(t[i]-t[i-1]); return v[i-1]+f*(v[i]-v[i-1]); } } return v[v.length-1]; }
-
 async function computeForecast(key){
   if(MODE==='api'){ try{ return await apiForecast(TWIN_ID,key); }catch(e){ MODE='offline'; setModePill(); } }
   return offlineForecast(offlineState,PLANS[key].courses);
 }
-
-/* ===================== 3D scene ===================== */
 const stageEl=document.getElementById('stage');
 let renderer,scene,camera,tumor,field,tumorTargetScale=0.5,tumorScale=0.5;
 function volToScale(v){ return Math.min(2.1,Math.max(0.22,0.9*Math.cbrt(v/200))); }
+function tumorGeometry(){
+  if(window.TUMOR_MESH && window.TUMOR_MESH.vertices){
+    const g=new THREE.BufferGeometry(), vs=window.TUMOR_MESH.vertices, fsx=window.TUMOR_MESH.faces;
+    const pos=new Float32Array(vs.length*3);
+    for(let i=0;i<vs.length;i++){ pos[i*3]=vs[i][0]; pos[i*3+1]=vs[i][1]; pos[i*3+2]=vs[i][2]; }
+    const idx=new Uint32Array(fsx.length*3);
+    for(let i=0;i<fsx.length;i++){ idx[i*3]=fsx[i][0]; idx[i*3+1]=fsx[i][1]; idx[i*3+2]=fsx[i][2]; }
+    g.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    g.setIndex(new THREE.BufferAttribute(idx,1)); g.computeVertexNormals();
+    g.scale(1.35,1.35,1.35); return g;
+  }
+  const g=new THREE.SphereGeometry(1,64,48), p=g.attributes.position;
+  const nz=(x,y,z)=>0.5*Math.sin(2.5*x)*Math.sin(2.9*y)*Math.sin(2.2*z);
+  for(let i=0;i<p.count;i++){ const x=p.getX(i),y=p.getY(i),z=p.getZ(i),d=1+0.12*nz(x,y,z); p.setXYZ(i,x*d,y*d,z*d); }
+  g.computeVertexNormals(); return g;
+}
 function initThree(){
-  const w=stageEl.clientWidth,h=stageEl.clientHeight;
+  const w=stageEl.clientWidth,h=stageEl.clientHeight||360;
   renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.setSize(w,h); stageEl.appendChild(renderer.domElement);
   scene=new THREE.Scene(); camera=new THREE.PerspectiveCamera(45,w/h,0.1,100); camera.position.set(0,0,5.6);
@@ -292,14 +359,8 @@ function initThree(){
     new THREE.MeshBasicMaterial({color:0x35D0BA,wireframe:true,transparent:true,opacity:0.10})); scene.add(field);
   scene.add(new THREE.Mesh(new THREE.SphereGeometry(2.56,32,24),
     new THREE.MeshBasicMaterial({color:0x35D0BA,transparent:true,opacity:0.03})));
-  const geo=new THREE.SphereGeometry(1,96,64); const pos=geo.attributes.position;
-  const noise=(x,y,z)=>0.5*Math.sin(2.5*x+1.3)*Math.sin(2.9*y)*Math.sin(2.2*z)+0.25*Math.sin(5.1*y+0.7)*Math.sin(4.3*z);
-  for(let i=0;i<pos.count;i++){ const x=pos.getX(i),y=pos.getY(i),z=pos.getZ(i); const d=1+0.12*noise(x,y,z); pos.setXYZ(i,x*d,y*d,z*d); }
-  geo.computeVertexNormals();
-  tumor=new THREE.Mesh(geo,new THREE.MeshStandardMaterial({color:0xFF7A59,emissive:0xFF4A2A,emissiveIntensity:0.35,roughness:0.55,metalness:0.05}));
+  tumor=new THREE.Mesh(tumorGeometry(),new THREE.MeshStandardMaterial({color:0xFF7A59,emissive:0xFF4A2A,emissiveIntensity:0.35,roughness:0.55,metalness:0.05}));
   scene.add(tumor);
-  const rim=new THREE.Mesh(geo.clone(),new THREE.MeshBasicMaterial({color:0xFF9A7A,transparent:true,opacity:0.12,side:THREE.BackSide}));
-  rim.scale.setScalar(1.08); tumor.add(rim);
   scene.add(new THREE.AmbientLight(0x9fb4ba,0.6));
   const key=new THREE.DirectionalLight(0xffffff,0.9); key.position.set(3,4,5); scene.add(key);
   const warm=new THREE.PointLight(0xFF7A59,0.7,20); warm.position.set(-4,-2,3); scene.add(warm);
@@ -313,24 +374,22 @@ function animate(){ requestAnimationFrame(animate);
     tumor.material.emissiveIntensity=0.30+0.08*Math.sin(performance.now()*0.0016); }
   renderer.render(scene,camera);
 }
-function resizeThree(){ if(!renderer)return; const w=stageEl.clientWidth,h=stageEl.clientHeight;
-  renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); }
-
-/* ===================== chart ===================== */
-const cv=document.getElementById('chart'),ctx=cv.getContext('2d'); let CW=0,CH=300;
-function resizeChart(){ const wrap=document.getElementById('chartWrap'); CW=wrap.clientWidth-20;
-  const dpr=Math.min(devicePixelRatio,2);
+function resizeThree(){ if(!renderer)return; const w=stageEl.clientWidth,h=stageEl.clientHeight||360;
+  if(w>0){ renderer.setSize(w,h); camera.aspect=w/h; camera.updateProjectionMatrix(); } }
+function chartCtx(id,wrapId){ const cv=document.getElementById(id),wrap=document.getElementById(wrapId);
+  const CW=wrap.clientWidth-20, CH=cv.height, dpr=Math.min(devicePixelRatio,2);
   cv.style.width=CW+'px'; cv.style.height=CH+'px'; cv.width=CW*dpr; cv.height=CH*dpr;
-  ctx.setTransform(dpr,0,0,dpr,0,0); drawChart(); }
-function yMax(){ let m=Math.max(...fc.hi); if(priorBand)m=Math.max(m,Math.max(...priorBand.hi)); return Math.max(200,Math.ceil(m/200)*200); }
-function drawChart(){ if(!CW)return;
-  const padL=52,padR=16,padT=14,padB=28,x0=padL,x1=CW-padR,y0=CH-padB,y1=padT,ymax=yMax();
+  const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); return {ctx,CW,CH}; }
+function axes(ctx,CW,CH,ymax){ const padL=52,padR=16,padT=14,padB=28,x0=padL,x1=CW-padR,y0=CH-padB,y1=padT;
   const X=d=>x0+(Math.min(d,365)/365)*(x1-x0), Y=v=>y0+(v/ymax)*(y1-y0);
-  ctx.clearRect(0,0,CW,CH);
-  ctx.strokeStyle="#202c31"; ctx.fillStyle="#5a6b70"; ctx.lineWidth=1; ctx.font='11px "IBM Plex Mono",monospace';
-  ctx.textAlign="right"; ctx.textBaseline="middle";
+  ctx.clearRect(0,0,CW,CH); ctx.strokeStyle="#202c31"; ctx.fillStyle="#5a6b70"; ctx.lineWidth=1;
+  ctx.font='11px "IBM Plex Mono",monospace'; ctx.textAlign="right"; ctx.textBaseline="middle";
   for(let g=0;g<=ymax;g+=ymax/4){ ctx.beginPath(); ctx.moveTo(x0,Y(g)); ctx.lineTo(x1,Y(g)); ctx.stroke(); ctx.fillText(g.toFixed(0),x0-8,Y(g)); }
   ctx.textAlign="center"; ctx.textBaseline="top"; for(let d=0;d<=365;d+=73) ctx.fillText(d,X(d),y0+7);
+  return {X,Y,x0,x1,y0,y1}; }
+function drawChart(){ const {ctx,CW,CH}=chartCtx('chart','chartWrap'); if(!CW)return;
+  let ymax=Math.max(...fc.hi); if(priorBand)ymax=Math.max(ymax,Math.max(...priorBand.hi)); ymax=Math.max(200,Math.ceil(ymax/200)*200);
+  const {X,Y,y0,y1}=axes(ctx,CW,CH,ymax);
   ctx.fillStyle="rgba(53,208,186,0.06)"; for(const c of PLANS[currentPlan].courses) ctx.fillRect(X(c.s),y1,X(c.e)-X(c.s),y0-y1);
   const band=(b,fill)=>{ ctx.beginPath(); ctx.moveTo(X(b.t[0]),Y(b.lo[0]));
     for(let i=1;i<b.t.length;i++) ctx.lineTo(X(b.t[i]),Y(b.lo[i]));
@@ -340,14 +399,29 @@ function drawChart(){ if(!CW)return;
     ctx.strokeStyle=color; ctx.lineWidth=w; ctx.stroke(); ctx.setLineDash([]); };
   if(priorBand){ band(priorBand,"rgba(74,91,97,0.16)"); line(priorBand,priorBand.med,"#4A5B61",1.4,[5,4]); }
   band(fc,"rgba(255,122,89,0.16)"); line(fc,fc.med,"#FF7A59",2.4);
-  for(const o of observations){ ctx.beginPath(); ctx.arc(X(o.day),Y(o.vol),4.5,0,7); ctx.fillStyle="#35D0BA"; ctx.fill();
-    ctx.lineWidth=2; ctx.strokeStyle="#0E1416"; ctx.stroke(); }
+  for(const o of observations){ ctx.beginPath(); ctx.arc(X(o.day),Y(o.vol),4.5,0,7); ctx.fillStyle="#35D0BA"; ctx.fill(); ctx.lineWidth=2; ctx.strokeStyle="#0E1416"; ctx.stroke(); }
   ctx.strokeStyle="rgba(228,234,236,0.35)"; ctx.lineWidth=1; ctx.setLineDash([3,3]);
   ctx.beginPath(); ctx.moveTo(X(currentDay),y1); ctx.lineTo(X(currentDay),y0); ctx.stroke(); ctx.setLineDash([]);
   ctx.beginPath(); ctx.arc(X(currentDay),Y(interp(fc.t,fc.med,currentDay)),4,0,7); ctx.fillStyle="#FF7A59"; ctx.fill();
 }
-
-/* ===================== UI ===================== */
+let cmpData=null;
+async function drawCompare(){
+  if(!cmpData){ cmpData={}; for(const k of Object.keys(PLANS)) cmpData[k]=await computeForecast(k); }
+  const {ctx,CW,CH}=chartCtx('cmpChart','cmpWrap'); if(!CW)return;
+  let ymax=0; for(const k in cmpData) ymax=Math.max(ymax,Math.max(...cmpData[k].med)); ymax=Math.max(200,Math.ceil(ymax/200)*200);
+  const {X,Y}=axes(ctx,CW,CH,ymax);
+  for(const k of Object.keys(PLANS)){ const b=cmpData[k]; ctx.beginPath();
+    for(let i=0;i<b.t.length;i++){ const px=X(b.t[i]),py=Y(b.med[i]); i?ctx.lineTo(px,py):ctx.moveTo(px,py); }
+    ctx.strokeStyle=PLAN_COLORS[k]; ctx.lineWidth=2.2; ctx.stroke(); }
+  const leg=document.getElementById('cmpLegend'); leg.innerHTML="";
+  for(const k of Object.keys(PLANS)){ const el=document.createElement('div'); el.className="it";
+    el.innerHTML='<span class="sw" style="background:'+PLAN_COLORS[k]+'"></span>'+PLANS[k].label; leg.appendChild(el); }
+  const tb=document.querySelector('#cmpTable tbody'); tb.innerHTML="";
+  for(const k of Object.keys(PLANS)){ const b=cmpData[k], n=b.med.length-1;
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td><span class="dotc" style="background:'+PLAN_COLORS[k]+'"></span>'+PLANS[k].label+'</td>'+
+      '<td>'+fmt(b.med[n])+'</td><td>'+fmt(b.lo[n])+'–'+fmt(b.hi[n])+'</td>'; tb.appendChild(tr); }
+}
 function setModePill(){ const el=document.getElementById('modePill');
   el.className='modepill '+(MODE==='api'?'live':'offline'); el.textContent=MODE==='api'?'live API':'offline demo'; }
 function buildOpts(){ const box=document.getElementById('opts'); box.innerHTML="";
@@ -356,21 +430,35 @@ function buildOpts(){ const box=document.getElementById('opts'); box.innerHTML="
     el.innerHTML='<span class="dot"></span><span class="lab">'+p.label+'</span><span class="sub">'+(key==="none"?"baseline":"scenario")+'</span>';
     el.onclick=async()=>{ currentPlan=key; buildOpts(); await refresh(); }; box.appendChild(el); } }
 function fmt(n){ return Math.round(n).toLocaleString(); }
+function renderDrivers(){ const box=document.getElementById('drivers');
+  if(!window.DRIVERS){ box.innerHTML='<div style="color:var(--faint);font-size:12px">run build_web_assets.py to populate</div>'; return; }
+  const max=Math.max(...window.DRIVERS.map(d=>Math.abs(d.effect)))||1; box.innerHTML="";
+  for(const d of window.DRIVERS){ const row=document.createElement('div'); row.className="drow";
+    const wpct=Math.max(3,Math.abs(d.effect)/max*100);
+    row.innerHTML='<span class="dl">'+d.label+'</span>'+
+      '<div class="dbar'+(d.effect<0?' neg':'')+'" style="width:'+wpct+'%"></div>'+
+      '<span class="de">'+(d.effect>0?'+':'')+d.effect+'</span>'; box.appendChild(row); } }
+function renderImaging(){
+  if(window.SCAN_SLICE) document.getElementById('imgScan').src=window.SCAN_SLICE;
+  if(window.SCAN_OVERLAY) document.getElementById('imgOverlay').src=window.SCAN_OVERLAY;
+  const t=document.getElementById('featTable');
+  if(window.IMAGING_FEATURES){ t.innerHTML="";
+    const nice={volume_cm3:"volume (cm³)",surface_area_mm2:"surface (mm²)",sphericity:"sphericity",max_diameter_mm:"max diameter (mm)",intensity_mean:"mean intensity",intensity_std:"intensity SD",intensity_skew:"intensity skew",heterogeneity:"heterogeneity"};
+    for(const k in window.IMAGING_FEATURES){ const tr=document.createElement('tr');
+      tr.innerHTML='<td>'+(nice[k]||k)+'</td><td>'+window.IMAGING_FEATURES[k]+'</td>'; t.appendChild(tr); } } }
 function updateBeliefUI(){ document.getElementById('chDbl').textContent=Math.round(belief.implied_doubling_time_days)+" d";
   const resp=belief.chemo_sensitivity>0.05?"responder":belief.chemo_sensitivity>0.03?"partial":"resistant";
   document.getElementById('chResp').textContent=resp;
   document.getElementById('chResp').parentElement.classList.toggle('alert',resp!=="responder");
   document.getElementById('chVer').textContent="v"+belief.version; }
-function updateDay(day){ currentDay=day; const vol=interp(fc.t,fc.med,day);
-  tumorTargetScale=volToScale(vol);
+function updateDay(day){ currentDay=day; const vol=interp(fc.t,fc.med,day); tumorTargetScale=volToScale(vol);
   document.getElementById('roDay').textContent="day "+day;
   document.getElementById('roVol').innerHTML=fmt(vol)+'<small> cm³</small>';
   document.getElementById('tlVal').textContent="day "+day; }
 async function refresh(){ fc=await computeForecast(currentPlan); const last=fc.med.length-1;
   document.getElementById('fcMed').textContent=fmt(fc.med[last])+" cm³";
   document.getElementById('fcCI').textContent=fmt(fc.lo[last])+"–"+fmt(fc.hi[last]);
-  updateDay(currentDay); drawChart(); updateBeliefUI(); }
-
+  cmpData=null; updateDay(currentDay); drawChart(); updateBeliefUI(); }
 document.getElementById('tl').addEventListener('input',e=>{ updateDay(+e.target.value); drawChart(); });
 document.getElementById('scanBtn').addEventListener('click',async()=>{
   if(observations.length>=3)return;
@@ -386,18 +474,23 @@ document.getElementById('scanBtn').addEventListener('click',async()=>{
   toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),3200);
   if(observations.length>=3){ const b=document.getElementById('scanBtn'); b.disabled=true; b.textContent="3 scans assimilated"; }
 });
-
-/* ===================== boot ===================== */
+document.querySelectorAll('.tab').forEach(tab=>{ tab.onclick=async()=>{
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  tab.classList.add('active'); const id=tab.dataset.tab;
+  document.getElementById('tab-'+id).classList.add('active');
+  if(id==='twin'){ resizeThree(); drawChart(); }
+  if(id==='compare'){ await drawCompare(); }
+}; });
 async function boot(){
-  initThree(); buildOpts(); resizeChart();
+  initThree(); buildOpts(); renderDrivers(); renderImaging();
   try{ if(await apiHealth()){ const bel=await apiCreate(); TWIN_ID=bel.patient_id; belief=bel; MODE='api'; } }
   catch(e){ MODE='offline'; }
   if(MODE!=='api'){ offlineState=samplePrior(); belief=offlineBelief(offlineState,0,0); }
-  setModePill();
-  if(!REDUCE) tumorScale=0;
+  setModePill(); if(!REDUCE) tumorScale=0;
   await refresh();
 }
-window.addEventListener('resize',()=>{ resizeThree(); resizeChart(); });
+window.addEventListener('resize',()=>{ resizeThree(); drawChart(); if(document.getElementById('tab-compare').classList.contains('active')) drawCompare(); });
 boot();
 </script>
 </body>

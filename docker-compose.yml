@@ -10,7 +10,7 @@ services:
     image: python:3.11-slim
     working_dir: /web
     volumes:
-      - ./web:/web
+      - .:/web
     command: python -m http.server 8080
     ports:
       - "8080:8080"

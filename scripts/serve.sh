@@ -9,6 +9,6 @@ echo "→ API   http://localhost:8000  (docs at /docs)"
 uvicorn oncotwin.api.main:app --port 8000 &
 
 echo "→ Web   http://localhost:8080"
-python -m http.server 8080 --directory web &
+python -m http.server 8080 &
 
 wait

@@ -69,25 +69,27 @@ Train the parameter estimator and evaluate it end-to-end:
 make analysis        # -> analysis/RESULTS.md + figures
 ```
 
-This trains on a synthetic cohort, backtests the heuristic vs the trained
-estimator (assimilate 2 scans, forecast the rest), and reports forecast error,
-90%-interval coverage, and a PIT calibration diagnostic.
+This trains on a synthetic cohort and backtests three configurations (assimilate
+2 scans, forecast the rest): heuristic priors, the trained estimator, and the
+trained estimator with a **calibration fix** — horizon-growing process noise.
 
 ![estimator comparison](analysis/outputs/estimator_comparison.png)
 
-Training improves accuracy and calibration, but the analysis is honest about the
-current limitation: **both estimators are still overconfident** — with only two
-scans the particle filter concentrates the ensemble and the forecast omits
-process noise, so the bands are too tight. The fixes are tracked in the roadmap.
-Full write-up: [analysis/RESULTS.md](analysis/RESULTS.md).
+The prior-only and trained models were badly overconfident (90% bands covering
+the truth only ~30–36% of the time). Adding process noise that grows with the
+forecast horizon brings coverage to ~90% *without* hurting accuracy — the
+intervals now mean what they say. Full write-up:
+[analysis/RESULTS.md](analysis/RESULTS.md).
 
 ## Quickstart
 
 ```bash
 pip install -e ".[dev]"      # install
-make test                    # run the test suite
-make demo                    # generate the figures above
-make backtest                # validate forecast calibration on a synthetic cohort
+make test                    # run the test suite (20 tests)
+make demo                    # forecast + living-twin figures
+make imaging-demo            # scan -> segmentation -> twin figure
+make analysis                # train + prove the calibration fix
+make assets                  # rebuild the web UI's mesh/scan/feature data
 ```
 
 Run the full app (API + 3D web UI):
@@ -98,8 +100,10 @@ make serve
 # Web  → http://localhost:8080
 ```
 
-The web UI calls the API when it is running and falls back to an in-browser copy
-of the engine otherwise, so `web/index.html` also works opened directly.
+The web UI has three tabs — Twin (3D segmented tumor, forecast, feature drivers),
+Imaging (scan, segmentation, radiomics), and Compare (all strategies overlaid).
+It calls the API when running and falls back to an in-browser copy of the engine
+otherwise, so `index.html` also works opened directly.
 
 ---
 
@@ -136,10 +140,13 @@ print(engine.explain(twin))                # updated belief, bumped version
 
 ```
 src/oncotwin/      engine (domain, growth, parameters, forecast, assimilation, engine)
-                   store, validation, data/ (cohort adapters), api/ (FastAPI)
-web/               3D twin UI (Three.js), API-backed with offline fallback
-tests/             pytest suite (engine + API)
-examples/demo.py   end-to-end demo that produces the figures
+                   imaging, explain, store, validation, data/, api/ (FastAPI)
+index.html         3-tab twin UI (Three.js), API-backed with offline fallback
+assets.js          real pipeline outputs for the UI (tumor mesh, scan, features)
+tests/             pytest suite (20 tests: engine, API, imaging, biology, calibration)
+examples/          demo.py, imaging_demo.py
+analysis/          run_analysis.py + RESULTS.md (training & calibration)
+scripts/           build_web_assets.py, serve.sh
 docs/              ARCHITECTURE.md, ROADMAP.md
 ```
 

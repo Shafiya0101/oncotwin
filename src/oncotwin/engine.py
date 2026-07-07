@@ -15,9 +15,15 @@ from .forecast import Forecast, forecast
 
 
 class OncoTwinEngine:
-    def __init__(self, estimator: ParameterEstimator | None = None):
+    # Calibrated on synthetic backtests so 90% predictive intervals are honest
+    # (coverage ~90%+ vs ~35% without it). See analysis/run_analysis.py.
+    DEFAULT_PROCESS_NOISE = 0.003
+
+    def __init__(self, estimator: ParameterEstimator | None = None,
+                 process_noise: float | None = None):
         # Swap HeuristicEstimator for a trained model in production.
         self.estimator = estimator or HeuristicEstimator(seed=7)
+        self.process_noise = self.DEFAULT_PROCESS_NOISE if process_noise is None else process_noise
 
     def create_twin(
         self, patient_id: str, features: PatientFeatures,
@@ -31,7 +37,8 @@ class OncoTwinEngine:
         horizon_days: float = 365, step: float = 5.0,
     ) -> Forecast:
         t = np.arange(0.0, horizon_days + step, step)
-        return forecast(twin.features.baseline_volume_cm3, twin.parameters, plan, t)
+        return forecast(twin.features.baseline_volume_cm3, twin.parameters, plan, t,
+                        process_noise=self.process_noise)
 
     def simulate_counterfactuals(
         self, twin: PatientTwin, plans: list[TreatmentPlan],

@@ -7,7 +7,7 @@ api:
 	uvicorn oncotwin.api.main:app --reload --port 8000
 
 web:
-	python -m http.server 8080 --directory web
+	python -m http.server 8080
 
 serve:
 	./scripts/serve.sh
@@ -26,6 +26,9 @@ backtest:
 
 analysis:
 	python analysis/run_analysis.py
+
+assets:
+	python scripts/build_web_assets.py
 
 clean:
 	rm -rf build dist *.egg-info src/*.egg-info .pytest_cache data/twins examples/outputs

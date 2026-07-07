@@ -34,7 +34,8 @@ class BacktestResult:
 
 
 def backtest(records: list[PatientRecord], engine: OncoTwinEngine | None = None,
-             plan: TreatmentPlan | None = None, warmup: int = 2) -> BacktestResult:
+             plan: TreatmentPlan | None = None, warmup: int = 2,
+             process_noise: float = 0.0) -> BacktestResult:
     engine = engine or OncoTwinEngine()
     errors, hits, total = [], 0, 0
 
@@ -46,7 +47,8 @@ def backtest(records: list[PatientRecord], engine: OncoTwinEngine | None = None,
 
         held = rec.measurements[warmup:]
         t_eval = np.array([m.time_days for m in held])
-        f = _forecast(rec.features.baseline_volume_cm3, twin.parameters, plan, t_eval)
+        f = _forecast(rec.features.baseline_volume_cm3, twin.parameters, plan, t_eval,
+                      process_noise=process_noise)
 
         for i, m in enumerate(held):
             errors.append(abs(f.median[i] - m.volume_cm3))

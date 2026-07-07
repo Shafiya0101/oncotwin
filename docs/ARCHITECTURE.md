@@ -18,6 +18,12 @@ it, so any layer can be swapped without rewriting the others.
 
 ## Layers
 
+Imaging (`imaging.py`) — the multimodal front door. Loads a volume (phantom,
+`.npy`, or NIfTI), segments the tumor, extracts radiomic features (shape,
+intensity, texture), and `fuse()`s them with clinical/molecular data into a
+`PatientFeatures`. The segmenter and feature set are transparent baselines with
+production swap points (trained segmentation model; a full radiomics library).
+
 Domain (`domain.py`) — the source-agnostic data model: `PatientFeatures`,
 `ParameterEnsemble` (particles + weights), `PatientTwin`, treatment plans, and
 tumor measurements. Everything else speaks in these types.

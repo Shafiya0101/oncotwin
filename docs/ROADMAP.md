@@ -2,6 +2,8 @@
 
 ## Done
 
+- Multimodal imaging pipeline: segment tumor → radiomics → fuse with clinical
+  data → twin (`imaging.py`, `make imaging-demo`)
 - Hybrid twin engine: mechanistic Gompertz + treatment, ML-estimated parameters
 - Probabilistic forecasting with 90% uncertainty bands
 - Bayesian recalibration (particle filter) — the living-twin loop
@@ -31,8 +33,9 @@ Concrete fixes, in order:
    (segmented volumes + radiomics) joined to TCGA/cBioPortal molecular and
    clinical data, and refit `LearnedEstimator` on it. Start with one disease
    (NSCLC or glioblastoma).
-3. **Imaging pipeline** — tumor segmentation → radiomic features feeding the
-   estimator (currently assumed as inputs).
+3. **Production imaging** — replace the threshold segmenter with a trained model
+   (e.g. nnU-Net) and a full radiomics library (e.g. PyRadiomics), behind the
+   existing `segment_tumor` / `extract_radiomics` interfaces.
 4. **Explainability layer** — attribute each forecast to the features and
    parameters driving it (the belief readout is the seed of this).
 5. **Auth, multi-patient, database store** for a real deployment.

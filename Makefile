@@ -12,6 +12,9 @@ web:
 serve:
 	./scripts/serve.sh
 
+imaging-demo:
+	python examples/imaging_demo.py
+
 demo:
 	python examples/demo.py
 

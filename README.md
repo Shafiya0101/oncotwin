@@ -14,6 +14,23 @@ counterfactual treatment strategies in silico.
 
 ---
 
+## Multimodal: imaging + clinical data
+
+The pipeline turns an actual scan into twin inputs and fuses them with clinical
+data — the multimodal core of the project:
+
+```
+load scan → segment tumor → extract radiomics → fuse(+ clinical) → patient twin
+```
+
+![Multimodal pipeline](docs/assets/multimodal_pipeline.png)
+
+Imaging contributes the segmented tumor volume and texture-based heterogeneity;
+clinical/molecular data contributes stage, age, and markers. Runs on a phantom
+scan out of the box (`make imaging-demo`) and on real `.npy` / NIfTI (TCIA,
+BraTS) via `load_volume`. The threshold segmenter is a transparent baseline —
+swap a trained model behind the same interface.
+
 ## What makes it a *twin*, not a predictor
 
 1. **Living state.** New measurements recalibrate the twin's parameters via

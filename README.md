@@ -94,12 +94,7 @@ noise that grows with the forecast horizon brings 90% coverage from ~35% to ~90%
 The project goes beyond synthetic data and engages honestly with a real public
 cohort.
 
-- **Real survival validation** (`python analysis/real_data_analysis.py`) — for
-  399 real NSCLC patients, the twin's biology-based risk was compared to actual
-  survival. It scored a **concordance index of 0.505 — at chance**. This honest
-  negative result is reported truthfully: the growth model was not trained on
-  survival, and per-patient imaging features were not yet loaded. See
-  [analysis/REAL_RESULTS.md](analysis/REAL_RESULTS.md).
+- **Real survival validation** (`python analysis/survival_ablation.py`): 421 real NSCLC patients (1 of 422 excluded because its contour file referenced CT slices missing from the download), repeated 5-fold cross-validation with bootstrap confidence intervals. Clinical variables alone: C-index 0.540 (95% CI 0.507 to 0.572). Imaging features: 0.582 (0.549 to 0.613). Imaging + clinical: 0.581 (0.549 to 0.612). Imaging gives a modest signal, and adding clinical data on top of it gives no measurable gain. The earlier untrained twin risk scored 0.505 (at chance) on 399 patients. Calibration of the survival probabilities is weak: predictions are compressed into a narrow range. See [analysis/REAL_RESULTS.md](analysis/REAL_RESULTS.md).
 - **Real CT ingestion** (`python scripts/get_one_scan.py`) — downloads a real CT
   from TCIA and loads it end-to-end (134×512×512, Hounsfield units).
 - **Real expert-mask radiomics** (`python scripts/get_scan_with_mask.py`) — loads

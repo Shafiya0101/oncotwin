@@ -1,41 +1,44 @@
-# Real-data validation (NSCLC-Radiomics / Lung1)
+# Real-cohort results: TCIA NSCLC-Radiomics (Lung1)
 
-Source: TCIA NSCLC-Radiomics clinical data — 399 real NSCLC patients. For each
-patient the twin is built from real age, stage, and histology; its implied tumor
-growth rate is used as a risk score and compared to real survival.
+421 patients, 372 deaths. Outcome: overall survival. Repeated 5-fold cross-validation x 10 repeats; every data-dependent step is fitted inside training folds; 1000 patient-level bootstrap resamples (95% percentile intervals). Full protocol: docs/EVAL_PROTOCOL.md.
 
-- **Concordance index: 0.505** (0.5 = chance). At this value, the twin's
-  biology-based risk does **not** predict real survival better than chance.
-- **Median survival** — twin high-risk group: 583 days; low-risk group: 543 days
-  (essentially the same).
+## Discrimination
 
-![survival by twin risk](outputs/real_survival_validation.png)
+- **clinical**: C-index 0.540 (95% CI 0.507 to 0.572), above chance.
+- **imaging**: C-index 0.582 (95% CI 0.549 to 0.613), above chance.
+- **imaging+clinical**: C-index 0.581 (95% CI 0.549 to 0.612), above chance.
 
-## Why this result — and why it still matters
+## Does adding information help?
 
-This is an honest negative result, and an expected one:
+Paired bootstrap differences in C-index (same resamples for both models):
 
-- The growth model was **never trained on survival** — it uses hand-set
-  biological priors, so there is no reason it would rank real survival.
-- The **imaging features that carry the prognostic signal are not loaded yet**
-  (tumor volume, heterogeneity use cohort defaults), so the twin's risk here is
-  driven only by stage and age.
+- imaging - clinical: +0.041 (95% CI -0.005 to 0.084); the interval includes zero, so this difference is not established.
+- imaging+clinical - clinical: +0.041 (95% CI 0.005 to 0.074); the interval excludes zero.
+- imaging+clinical - imaging: -0.001 (95% CI -0.017 to 0.016); the interval includes zero, so this difference is not established.
 
-The landmark study on this exact dataset showed that radiomic features extracted
-from the scans *do* predict survival — and those features live in imaging we
-have not yet ingested per patient. So the signal exists; we are simply not using
-the part of the data that contains it.
+## Calibration (24 months)
 
-## What would move this number
+- **clinical**: mean absolute calibration error 0.062 (predicted vs Kaplan-Meier observed survival across 5 risk groups). See the table in analysis/outputs/real_cohort/RESULTS_real_cohort.md.
+- **imaging**: mean absolute calibration error 0.054 (predicted vs Kaplan-Meier observed survival across 5 risk groups). See the table in analysis/outputs/real_cohort/RESULTS_real_cohort.md.
+- **imaging+clinical**: mean absolute calibration error 0.057 (predicted vs Kaplan-Meier observed survival across 5 risk groups). See the table in analysis/outputs/real_cohort/RESULTS_real_cohort.md.
 
-1. Ingest the real CT scans with their expert tumor masks and extract radiomics
-   across the cohort.
-2. Train the estimator against survival directly (e.g. a Cox model) instead of
-   synthetic growth parameters.
+## Most important variables
 
-## Honest limitations
+Permutation importance on held-out folds (imaging+clinical model), top five with the mean drop in C-index: oncotwin_volume_cm3 (0.013), oncotwin_max_diameter_mm (0.011), oncotwin_intensity_mean (0.007), age (0.004), n_stage (0.002).
 
-Tumor volume, Ki-67, and imaging heterogeneity use cohort defaults (no
-per-patient imaging yet). This is a simple validation, not a trained survival
-model. Reporting a chance-level result truthfully is the point: the twin has
-**not** been shown to predict real survival, and this document says so.
+## Limitations
+
+- Single retrospective cohort; no external validation.
+- Imaging features come from the project's own radiomics code (few features, not the standard IBSI set).
+- Ridge-penalised Cox model; no non-linear models were tried.
+- Calibration is shown at one horizon (24 months) with wide intervals in small risk groups.
+- Molecular (omics) data are not included in this analysis.
+
+## Reproduce
+
+```
+python scripts/build_clinical_table.py data/real/Lung1.clinical.csv
+python scripts/extract_cohort_radiomics.py
+python analysis/survival_ablation.py
+python analysis/write_real_results.py
+```

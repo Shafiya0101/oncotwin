@@ -33,3 +33,19 @@ assets:
 clean:
 	rm -rf build dist *.egg-info src/*.egg-info .pytest_cache data/twins examples/outputs
 	find . -name __pycache__ -type d -prune -exec rm -rf {} +
+# Append to your Makefile with:  type Makefile.week1 >> Makefile   (run it ONCE)
+.PHONY: clinical radiomics ablation results real-cohort
+
+clinical:
+	python scripts/build_clinical_table.py data/real/Lung1.clinical.csv
+
+radiomics:
+	python scripts/extract_cohort_radiomics.py
+
+ablation:
+	python analysis/survival_ablation.py
+
+results:
+	python analysis/write_real_results.py
+
+real-cohort: clinical radiomics ablation results

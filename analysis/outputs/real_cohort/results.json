@@ -1,0 +1,408 @@
+{
+  "config": {
+    "radiomics": "data/real/radiomics.csv",
+    "clinical": "data/real/clinical.csv",
+    "baseline_csv": null,
+    "out": null,
+    "id_col": "PatientID",
+    "folds": 5,
+    "repeats": 10,
+    "bootstrap": 1000,
+    "seed": 42,
+    "horizons_months": [
+      12,
+      24,
+      36
+    ],
+    "calib_month": 24,
+    "demo": false,
+    "no_importance": false,
+    "importance_repeats": 3,
+    "clinical_only": false,
+    "n_patients": 421,
+    "n_events": 372,
+    "alphas_grid": [
+      0.003,
+      0.03,
+      0.3,
+      3.0,
+      30.0
+    ],
+    "median_chosen_alpha": {
+      "clinical": 0.003,
+      "imaging": 30.0,
+      "imaging+clinical": 30.0
+    },
+    "python": "3.12.10",
+    "numpy": "2.5.1"
+  },
+  "cv_fold_c_mean": {
+    "clinical": 0.5383109775776523,
+    "imaging": 0.5809688269351824,
+    "imaging+clinical": 0.5778067989550607
+  },
+  "cv_fold_c_sd": {
+    "clinical": 0.030120794064338527,
+    "imaging": 0.03156002965252158,
+    "imaging+clinical": 0.03055504880036095
+  },
+  "bootstrap": {
+    "models": {
+      "clinical": {
+        "c": 0.5404479854631862,
+        "c_ci": [
+          0.5068278535864457,
+          0.5717478668294159
+        ],
+        "auc": [
+          0.5385963937194533,
+          0.5600548460753293,
+          0.5661501859721976
+        ],
+        "auc_ci": [
+          [
+            0.47976538972081983,
+            0.6005064972766289
+          ],
+          [
+            0.5038442246602246,
+            0.6152538016595421
+          ],
+          [
+            0.5123464942890338,
+            0.6233781721242813
+          ]
+        ]
+      },
+      "imaging": {
+        "c": 0.5815890321603708,
+        "c_ci": [
+          0.5489354410611265,
+          0.6128863482528072
+        ],
+        "auc": [
+          0.6390740256337251,
+          0.6318901214384991,
+          0.6434402851940458
+        ],
+        "auc_ci": [
+          [
+            0.5807148898438836,
+            0.6907961407176987
+          ],
+          [
+            0.5752023965131827,
+            0.6904059330554501
+          ],
+          [
+            0.5805746304078286,
+            0.7026019542778701
+          ]
+        ]
+      },
+      "imaging+clinical": {
+        "c": 0.5809483873222211,
+        "c_ci": [
+          0.548928633095215,
+          0.6117416151641825
+        ],
+        "auc": [
+          0.6289646573373201,
+          0.624385947475554,
+          0.6439157554586139
+        ],
+        "auc_ci": [
+          [
+            0.5672114609890728,
+            0.6799287319403601
+          ],
+          [
+            0.5680316027979744,
+            0.6786437569190746
+          ],
+          [
+            0.5831168045031471,
+            0.7023004268092589
+          ]
+        ]
+      }
+    },
+    "pairs": {
+      "imaging - clinical": {
+        "delta": 0.04114104669718466,
+        "ci": [
+          -0.005175461346767418,
+          0.08382447289475572
+        ],
+        "excludes_zero": false
+      },
+      "imaging+clinical - clinical": {
+        "delta": 0.04050040185903492,
+        "ci": [
+          0.0052994422660565,
+          0.07414538943967702
+        ],
+        "excludes_zero": true
+      },
+      "imaging+clinical - imaging": {
+        "delta": -0.0006406448381497398,
+        "ci": [
+          -0.017252555264633138,
+          0.016306404766276376
+        ],
+        "excludes_zero": false
+      }
+    },
+    "n_boot": 1000
+  },
+  "calibration": {
+    "clinical": {
+      "bins": [
+        {
+          "n": 85,
+          "events": 81,
+          "mean_predicted": 0.25790651196251524,
+          "observed_km": 0.31764705882352934,
+          "obs_ci": [
+            0.22352941176470584,
+            0.423529411764706
+          ]
+        },
+        {
+          "n": 84,
+          "events": 74,
+          "mean_predicted": 0.3410833567184284,
+          "observed_km": 0.3270676691729324,
+          "obs_ci": [
+            0.22097298534798537,
+            0.44047619047619024
+          ]
+        },
+        {
+          "n": 84,
+          "events": 73,
+          "mean_predicted": 0.4051352725868249,
+          "observed_km": 0.49999999999999994,
+          "obs_ci": [
+            0.3928571428571428,
+            0.6071428571428573
+          ]
+        },
+        {
+          "n": 84,
+          "events": 71,
+          "mean_predicted": 0.4618457851461046,
+          "observed_km": 0.4404761904761904,
+          "obs_ci": [
+            0.3452380952380951,
+            0.5357142857142857
+          ]
+        },
+        {
+          "n": 84,
+          "events": 73,
+          "mean_predicted": 0.5569179999410371,
+          "observed_km": 0.4362244897959183,
+          "obs_ci": [
+            0.3384878419452887,
+            0.5552311037561578
+          ]
+        }
+      ],
+      "mean_abs_calibration_error": 0.06213112148260648
+    },
+    "imaging": {
+      "bins": [
+        {
+          "n": 85,
+          "events": 78,
+          "mean_predicted": 0.35992960851821315,
+          "observed_km": 0.28235294117647053,
+          "obs_ci": [
+            0.188235294117647,
+            0.37647058823529406
+          ]
+        },
+        {
+          "n": 84,
+          "events": 73,
+          "mean_predicted": 0.3905885975013456,
+          "observed_km": 0.3755221386800333,
+          "obs_ci": [
+            0.27837301587301594,
+            0.4862562754044522
+          ]
+        },
+        {
+          "n": 84,
+          "events": 75,
+          "mean_predicted": 0.40459639459045554,
+          "observed_km": 0.369047619047619,
+          "obs_ci": [
+            0.2619047619047619,
+            0.47619047619047616
+          ]
+        },
+        {
+          "n": 84,
+          "events": 70,
+          "mean_predicted": 0.416340900733911,
+          "observed_km": 0.4962301587301586,
+          "obs_ci": [
+            0.3758785485347984,
+            0.5964127604166666
+          ]
+        },
+        {
+          "n": 84,
+          "events": 76,
+          "mean_predicted": 0.4372866894024624,
+          "observed_km": 0.49999999999999994,
+          "obs_ci": [
+            0.40476190476190466,
+            0.6190476190476192
+          ]
+        }
+      ],
+      "mean_abs_calibration_error": 0.05421451822450018
+    },
+    "imaging+clinical": {
+      "bins": [
+        {
+          "n": 85,
+          "events": 79,
+          "mean_predicted": 0.3704888863940258,
+          "observed_km": 0.2588235294117646,
+          "obs_ci": [
+            0.17029411764705885,
+            0.34117647058823525
+          ]
+        },
+        {
+          "n": 84,
+          "events": 78,
+          "mean_predicted": 0.3941208449735355,
+          "observed_km": 0.3690476190476189,
+          "obs_ci": [
+            0.2738095238095238,
+            0.46428571428571436
+          ]
+        },
+        {
+          "n": 84,
+          "events": 71,
+          "mean_predicted": 0.40385522280754943,
+          "observed_km": 0.44387755102040843,
+          "obs_ci": [
+            0.3415198465749936,
+            0.5616359447004609
+          ]
+        },
+        {
+          "n": 84,
+          "events": 71,
+          "mean_predicted": 0.4132250768856912,
+          "observed_km": 0.5119047619047619,
+          "obs_ci": [
+            0.4047619047619046,
+            0.6190476190476191
+          ]
+        },
+        {
+          "n": 84,
+          "events": 73,
+          "mean_predicted": 0.43336418338402816,
+          "observed_km": 0.4404761904761904,
+          "obs_ci": [
+            0.33333333333333326,
+            0.5419642857142855
+          ]
+        }
+      ],
+      "mean_abs_calibration_error": 0.05664152975889052
+    }
+  },
+  "importance": [
+    {
+      "variable": "oncotwin_volume_cm3",
+      "mean_c_drop": 0.013256371285265864,
+      "sd_over_folds": 0.010454130336590378
+    },
+    {
+      "variable": "oncotwin_max_diameter_mm",
+      "mean_c_drop": 0.011042128008848646,
+      "sd_over_folds": 0.007266529259947024
+    },
+    {
+      "variable": "oncotwin_intensity_mean",
+      "mean_c_drop": 0.007485909206688958,
+      "sd_over_folds": 0.01579779351067675
+    },
+    {
+      "variable": "age",
+      "mean_c_drop": 0.004431927894024651,
+      "sd_over_folds": 0.004143779914903046
+    },
+    {
+      "variable": "n_stage",
+      "mean_c_drop": 0.0019938143060461875,
+      "sd_over_folds": 0.01294432594341206
+    },
+    {
+      "variable": "oncotwin_heterogeneity",
+      "mean_c_drop": 0.0016727544317405745,
+      "sd_over_folds": 0.004004066849657428
+    },
+    {
+      "variable": "sex",
+      "mean_c_drop": 0.0011258296628546957,
+      "sd_over_folds": 0.005765050535219591
+    },
+    {
+      "variable": "oncotwin_sphericity",
+      "mean_c_drop": 0.0006673334133310752,
+      "sd_over_folds": 0.006803229195783326
+    },
+    {
+      "variable": "oncotwin_intensity_std",
+      "mean_c_drop": 0.00041855244361508275,
+      "sd_over_folds": 0.004033299801277394
+    },
+    {
+      "variable": "oncotwin_surface_area_mm2",
+      "mean_c_drop": 0.0,
+      "sd_over_folds": 0.0
+    },
+    {
+      "variable": "m_stage",
+      "mean_c_drop": -0.00026611184837482897,
+      "sd_over_folds": 0.0009814044613846579
+    },
+    {
+      "variable": "histology",
+      "mean_c_drop": -0.000622334326808265,
+      "sd_over_folds": 0.006507939853304346
+    },
+    {
+      "variable": "oncotwin_intensity_skew",
+      "mean_c_drop": -0.0007976520930869275,
+      "sd_over_folds": 0.0028979330228364264
+    },
+    {
+      "variable": "t_stage",
+      "mean_c_drop": -0.0025177933986016954,
+      "sd_over_folds": 0.004626597388614054
+    },
+    {
+      "variable": "overall_stage",
+      "mean_c_drop": -0.003139324361553661,
+      "sd_over_folds": 0.004470923859670112
+    }
+  ],
+  "importance_model": "imaging+clinical",
+  "horizons_months": [
+    12,
+    24,
+    36
+  ]
+}
